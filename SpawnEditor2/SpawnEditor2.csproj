@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <ProjectGuid>{009FCC93-8032-4228-8991-C0D8B4AC44E6}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SpawnEditor2</RootNamespace>
+    <AssemblyName>SpawnEditor2</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>True</UseWindowsForms>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableDefaultItems>False</EnableDefaultItems>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <StartupObject>SpawnEditor2.SpawnEditor</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Amount.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Amount.Designer.cs">
+      <DependentUpon>Amount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Area.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Area.Designer.cs">
+      <DependentUpon>Area.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChildNode.cs" />
+    <Compile Include="Configure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Configure.Designer.cs">
+      <DependentUpon>Configure.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntryEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EntryEdit.Designer.cs">
+      <DependentUpon>EntryEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SpawnerFilters.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SpawnerFilters.Designer.cs">
+      <DependentUpon>SpawnerFilters.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportMap.cs" />
+    <Compile Include="ImportMSF.cs" />
+    <Compile Include="LocationNode.cs" />
+    <Compile Include="LocationSubNode.cs" />
+    <Compile Include="LocationTree.cs" />
+    <Compile Include="MapLocation.cs" />
+    <Compile Include="MusicName.cs" />
+    <Compile Include="ParentNode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyTest.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="RegionFacetNode.cs" />
+    <Compile Include="RegionNode.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ErrorMessage.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\GetObjectData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\GetSpawnerData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ObjectData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\RemoteMessaging.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ReturnData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ReturnObjectData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ReturnSpawnerData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ReturnSpawnerSaveStatus.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ReturnSpawnerUnloadStatus.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\SaveSpawnerData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\TransferMessage.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\UnloadSpawnerData.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\ZLib.cs" />
+    <Compile Include="SpawnEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpawnEditor.Designer.cs">
+      <DependentUpon>SpawnEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpawnObject.cs" />
+    <Compile Include="SpawnObjectNode.cs" />
+    <Compile Include="SpawnPackNode.cs" />
+    <Compile Include="SpawnPackSubNode.cs" />
+    <Compile Include="SpawnPoint.cs" />
+    <Compile Include="SpawnPointAreaComparer.cs" />
+    <Compile Include="SpawnPointNode.cs" />
+    <Compile Include="TransferConnection.cs" />
+    <Compile Include="TransferServerSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferServerSettings.Designer.cs">
+      <DependentUpon>TransferServerSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WorldMap.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SpawnEditor.resources" />
+    <EmbeddedResource Include="SpawnEditor2\AboutForm.resources" />
+    <EmbeddedResource Include="SpawnEditor2\Amount.resources" />
+    <EmbeddedResource Include="SpawnEditor2\Area.resources" />
+    <EmbeddedResource Include="SpawnEditor2\Configure.resources" />
+    <EmbeddedResource Include="SpawnEditor2\EntryEdit.resources" />
+    <EmbeddedResource Include="SpawnEditor2\Forms\SpawnerFilters.resources" />
+    <EmbeddedResource Include="SpawnEditor2\SpawnEditor.resources" />
+    <EmbeddedResource Include="SpawnEditor2\TransferServerSettings.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="AxUOMAPLib">
+      <HintPath>..\..\XMLSpawnEditor_2.7_Fixes\AxUOMAPLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Ultima">
+      <HintPath>..\..\XMLSpawnEditor_2.7_Fixes\Ultima.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="app.manifest" />
+  </ItemGroup>
+</Project>
