@@ -9,7 +9,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFramework>net48</TargetFramework>
     <UseWindowsForms>True</UseWindowsForms>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <EnableDefaultItems>False</EnableDefaultItems>
@@ -70,6 +70,7 @@
     <Compile Include="RegionFacetNode.cs" />
     <Compile Include="RegionNode.cs" />
     <Compile Include="Server\Engines\XmlSpawner2\ErrorMessage.cs" />
+    <Compile Include="Server\Engines\XmlSpawner2\QueryAuthPosition.cs" />
     <Compile Include="Server\Engines\XmlSpawner2\GetObjectData.cs" />
     <Compile Include="Server\Engines\XmlSpawner2\GetSpawnerData.cs" />
     <Compile Include="Server\Engines\XmlSpawner2\ObjectData.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="SpawnPointAreaComparer.cs" />
     <Compile Include="SpawnPointNode.cs" />
     <Compile Include="TransferConnection.cs" />
+    <Compile Include="UOMapControl.cs" />
     <Compile Include="TransferServerSettings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,9 +119,6 @@
     <EmbeddedResource Include="SpawnEditor2\TransferServerSettings.resources" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="AxUOMAPLib">
-      <HintPath>..\..\XMLSpawnEditor_2.7_Fixes\AxUOMAPLib.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Ultima">
@@ -130,4 +129,44 @@
     <None Include="app.config" />
     <None Include="app.manifest" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Copy to solution-level dist\Client (one folder up from project) -->
+    <DistClientDir>$(MSBuildProjectDirectory)\..\dist\Client\</DistClientDir>
+  </PropertyGroup>
+
+  <Target Name="CopyToDist" AfterTargets="Build">
+    <MakeDir Directories="$(DistClientDir)" Condition="'$(DistClientDir)' != ''" />
+    <ItemGroup>
+      <_FilesToCopy Include="$(TargetPath)" />
+      <_FilesToCopy Include="$(TargetDir)$(AssemblyName).exe.config" Condition="Exists('$(TargetDir)$(AssemblyName).exe.config')" />
+      <_FilesToCopy Include="$(TargetDir)$(AssemblyName).pdb" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+      <_FilesToCopy Include="$(MSBuildProjectDirectory)\..\README.md" Condition="Exists('$(MSBuildProjectDirectory)\..\README.md')" />
+    </ItemGroup>
+    <!-- Also copy any built outputs from bin (handles x86/AnyCPU/platform-specific outputs) -->
+    <ItemGroup>
+      <_BinFiles Include="$(MSBuildProjectDirectory)\bin\**\$(AssemblyName).exe" />
+      <_BinFiles Include="$(MSBuildProjectDirectory)\bin\**\$(AssemblyName).pdb" Condition="Exists('%(Identity)')" />
+      <_BinFiles Include="$(MSBuildProjectDirectory)\bin\**\$(AssemblyName).exe.config" Condition="Exists('%(Identity)')" />
+    </ItemGroup>
+    <ItemGroup>
+      <_FilesToCopy Include="@(_BinFiles)" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_FilesToCopy)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Legacy behavior: also copy outputs from bin\x86\$(Configuration)\net48 if present -->
+  <Target Name="CopyBinX86ToDist" AfterTargets="Build">
+    <PropertyGroup>
+      <_BinX86Dir>$(MSBuildProjectDirectory)\bin\x86\$(Configuration)\net48\</_BinX86Dir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_X86Exe Include="$(_BinX86Dir)$(AssemblyName).exe" Condition="Exists('$(_BinX86Dir)$(AssemblyName).exe')" />
+      <_X86Config Include="$(_BinX86Dir)$(AssemblyName).exe.config" Condition="Exists('$(_BinX86Dir)$(AssemblyName).exe.config')" />
+      <_X86Pdb Include="$(_BinX86Dir)$(AssemblyName).pdb" Condition="Exists('$(_BinX86Dir)$(AssemblyName).pdb')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_X86Exe)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" Condition="@(_X86Exe) != ''" />
+    <Copy SourceFiles="@(_X86Config)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" Condition="@(_X86Config) != ''" />
+    <Copy SourceFiles="@(_X86Pdb)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" Condition="@(_X86Pdb) != ''" />
+  </Target>
 </Project>

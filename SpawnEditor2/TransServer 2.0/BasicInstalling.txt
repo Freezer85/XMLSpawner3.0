@@ -1,0 +1,17 @@
+7-10-2014
+XML Spawn Editor TransServer script package, attempted updating.
+------------------------------------------------------------------
+
+
+
+
+XML Spawn Editor v_1.8
+
+Installing:
+1. Drop the TransServer folder scripts into your directory of choice, anywhere within the Root/Scripts folder of RunUO/ServUO
+2. Add the TransServer.dll to your Root directory.
+3. Open RunUO/Data/Assemblies.cfg  and add the entry TransferServer.dll  to the list.
+4. If you are using Visual Studios, right click 'Add Reference' and select the browse tab, select the TransServer.dll
+
+
+This is as far as installing go's and still in limbo is the Tcp protocol.

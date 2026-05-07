@@ -16,6 +16,17 @@ namespace SpawnEditor2.Forms
 			this.InitializeSettings();
 		}
 
+		protected override void OnFormClosing(FormClosingEventArgs e)
+		{
+			if (e.CloseReason == CloseReason.UserClosing)
+			{
+				e.Cancel = true;
+				base.Hide();
+				return;
+			}
+			base.OnFormClosing(e);
+		}
+
 		// Token: 0x06000222 RID: 546 RVA: 0x00028558 File Offset: 0x00026758
 		private void InitializeSettings()
 		{

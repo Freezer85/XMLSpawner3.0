@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
-using AxUOMAPLib;
 using Server.Engines.XmlSpawner2;
 using SpawnEditor2.Forms;
 using Ultima;
@@ -59,9 +60,6 @@ namespace SpawnEditor2
 			}
 			try
 			{
-				// TEMP: Show debug messages in MessageBox for testing
-				MessageBox.Show("DEBUG: " + msg, "Debug Log", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				
 				using (StreamWriter streamWriter = new StreamWriter("debug.log", true))
 				{
 					streamWriter.WriteLine("{0}: {1}", DateTime.Now, msg);
@@ -70,6 +68,30 @@ namespace SpawnEditor2
 			catch
 			{
 			}
+		}
+
+		public static void LogWarning(string msg)
+		{
+			try
+			{
+				using (StreamWriter sw = new StreamWriter("spawneditor.log", true))
+				{
+					sw.WriteLine("{0} [WARN]: {1}", DateTime.Now, msg);
+				}
+			}
+			catch { }
+		}
+
+		public static void LogError(string msg)
+		{
+			try
+			{
+				using (StreamWriter sw = new StreamWriter("spawneditor.log", true))
+				{
+					sw.WriteLine("{0} [ERROR]: {1}", DateTime.Now, msg);
+				}
+			}
+			catch { }
 		}
 
 		// Token: 0x0600009A RID: 154 RVA: 0x000099FC File Offset: 0x00007BFC
@@ -196,7 +218,15 @@ namespace SpawnEditor2
 						this.cbxMap.Items.Add(worldMap);
 					}
 				}
-				this.axUOMap.SetClientPath(Path.GetDirectoryName(this._CfgDialog.CfgUoClientPathValue) + "\\");
+				string mulPath = this._CfgDialog.CfgMulPathValue;
+				if (string.IsNullOrEmpty(mulPath) || !Directory.Exists(mulPath))
+				{
+					mulPath = Path.GetDirectoryName(this._CfgDialog.CfgUoClientPathValue);
+				}
+				string setPath = mulPath.TrimEnd('\\') + "\\";
+				bool hasMul = File.Exists(Path.Combine(setPath, "map0.mul"));
+				SpawnEditor.Debug("SetClientPath = " + setPath + " | map0.mul exists: " + hasMul);
+				this.axUOMap.SetClientPath(setPath);
 				this.axUOMap.ZoomLevel = this._CfgDialog.CfgZoomLevelValue;
 				this.trkZoom.Value = (int)this.axUOMap.ZoomLevel;
 				try
@@ -213,109 +243,8 @@ namespace SpawnEditor2
 				catch
 				{
 				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.ReadyState = " + this.axUOMap.ReadyState.ToString());
-				}
-				catch (Exception ex)
-				{
-					SpawnEditor.Debug("axUOMap.ReadyState read failed: " + ex.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.OcxState != null: " + (this.axUOMap.OcxState != null).ToString());
-				}
-				catch (Exception ex2)
-				{
-					SpawnEditor.Debug("axUOMap.OcxState read failed: " + ex2.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.SetClientPath = " + (this._CfgDialog.CfgUoClientPathValue ?? "<null>"));
-				}
-				catch (Exception ex3)
-				{
-					SpawnEditor.Debug("axUOMap.SetClientPath read failed: " + ex3.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.MapFile = " + this.axUOMap.MapFile.ToString());
-				}
-				catch (Exception ex4)
-				{
-					SpawnEditor.Debug("axUOMap.MapFile read failed: " + ex4.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.xCenter,yCenter = " + this.axUOMap.xCenter.ToString() + "," + this.axUOMap.yCenter.ToString());
-				}
-				catch (Exception ex5)
-				{
-					SpawnEditor.Debug("axUOMap center read failed: " + ex5.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.ZoomLevel = " + this.axUOMap.ZoomLevel.ToString());
-				}
-				catch (Exception ex6)
-				{
-					SpawnEditor.Debug("axUOMap.ZoomLevel read failed: " + ex6.Message);
-				}
-				try
-				{
-					SpawnEditor.Debug("axUOMap.MapWidth/MapHeight non disponibles sur AxUOMap.");
-				}
-				catch (Exception ex7)
-				{
-					SpawnEditor.Debug("axUOMap.MapWidth/MapHeight read failed: " + ex7.Message);
-				}
-				SpawnEditor.Debug("---- end of startup OCX state log ----");
-				global::System.Windows.Forms.Timer _axReadyTimer = new global::System.Windows.Forms.Timer();
-				_axReadyTimer.Interval = 200;
-				_axReadyTimer.Tick += delegate(object s, EventArgs ev)
-				{
-					try
-					{
-						SpawnEditor.tictoc++;
-						int ready;
-						try
-						{
-							ready = this.axUOMap.ReadyState;
-						}
-						catch (Exception ex9)
-						{
-							SpawnEditor.Debug("axUOMap.ReadyState read failed in timer: " + ex9.Message);
-							ready = 0;
-						}
-						SpawnEditor.Debug("axUOMap.ReadyState(poll) = " + ready.ToString());
-						if (ready == 4 || SpawnEditor.tictoc > 10)
-						{
-							_axReadyTimer.Stop();
-							_axReadyTimer.Dispose();
-							try
-							{
-								this.axUOMap.MouseMoveEvent += this.axUOMap_MouseMoveEvent;
-								SpawnEditor.Debug("Attached MouseMoveEvent after ReadyState==4");
-								try
-								{
-									this.RefreshSpawnPoints();
-								}
-								catch (Exception ex10)
-								{
-									SpawnEditor.Debug("RefreshSpawnPoints after ready failed: " + ex10.Message);
-								}
-							}
-							catch (Exception ex11)
-							{
-								SpawnEditor.Debug("Failed to attach MouseMoveEvent: " + ex11.ToString());
-							}
-						}
-					}
-					catch
-					{
-					}
-				};
-				_axReadyTimer.Start();
+				SpawnEditor.Debug("Map control ready, refreshing spawn points.");
+				this.RefreshSpawnPoints();
 				ArrayList arrayList = new ArrayList();
 				string directoryName = Path.GetDirectoryName(this._CfgDialog.CfgRunUoPathValue);
 				this.LoadCustomAssemblies(directoryName);
@@ -1969,7 +1898,7 @@ namespace SpawnEditor2
 		}
 
 		// Token: 0x060000AF RID: 175 RVA: 0x00018B04 File Offset: 0x00016D04
-		private void axUOMap_MouseDownEvent(object sender, _DUOMapEvents_MouseDownEvent e)
+		private void axUOMap_MouseDownEvent(object sender, UOMapMouseEventArgs e)
 		{
 			short num = this.axUOMap.CtrlToMapX((short)e.x);
 			short num2 = this.axUOMap.CtrlToMapY((short)e.y);
@@ -2005,7 +1934,7 @@ namespace SpawnEditor2
 		}
 
 		// Token: 0x060000B0 RID: 176 RVA: 0x00018C58 File Offset: 0x00016E58
-		private void axUOMap_MouseUpEvent(object sender, _DUOMapEvents_MouseUpEvent e)
+		private void axUOMap_MouseUpEvent(object sender, UOMapMouseEventArgs e)
 		{
 			short num = this.axUOMap.CtrlToMapX((short)e.x);
 			short num2 = this.axUOMap.CtrlToMapY((short)e.y);
@@ -2072,7 +2001,7 @@ namespace SpawnEditor2
 		}
 
 		// Token: 0x060000B1 RID: 177 RVA: 0x00018FD4 File Offset: 0x000171D4
-		private void axUOMap_MouseMoveEvent(object sender, _DUOMapEvents_MouseMoveEvent e)
+		private void axUOMap_MouseMoveEvent(object sender, UOMapMouseEventArgs e)
 		{
 			short num = this.axUOMap.CtrlToMapX((short)e.x);
 			short num2 = this.axUOMap.CtrlToMapY((short)e.y);
@@ -2133,18 +2062,18 @@ namespace SpawnEditor2
 						SpawnPointNode spawnPointNode = (SpawnPointNode)obj;
 						if (spawnPointNode.Spawn.Map == (WorldMap)this.cbxMap.SelectedItem && !spawnPointNode.Filtered && spawnPointNode.Spawn.IsSameArea(num, num2, 1))
 						{
-							AxUOMap axUOMap = this.axUOMap;
+							UOMapControl axUOMap = this.axUOMap;
 							int num4 = (int)((short)spawnPointNode.Spawn.Bounds.X);
 							int num5 = (int)axUOMap.MapToCtrlX((short)num4);
-							AxUOMap axUOMap2 = this.axUOMap;
+							UOMapControl axUOMap2 = this.axUOMap;
 							int num6 = (int)((short)spawnPointNode.Spawn.Bounds.Y);
 							int num7 = (int)axUOMap2.MapToCtrlY((short)num6);
-							AxUOMap axUOMap3 = this.axUOMap;
+							UOMapControl axUOMap3 = this.axUOMap;
 							int x2 = spawnPointNode.Spawn.Bounds.X;
 							int width = spawnPointNode.Spawn.Bounds.Width;
 							int num8 = (int)((short)(x2 + width));
 							int num9 = (int)axUOMap3.MapToCtrlX((short)num8) - num5;
-							AxUOMap axUOMap4 = this.axUOMap;
+							UOMapControl axUOMap4 = this.axUOMap;
 							int y2 = spawnPointNode.Spawn.Bounds.Y;
 							int height = spawnPointNode.Spawn.Bounds.Height;
 							int num10 = (int)((short)(y2 + height));
@@ -2467,7 +2396,7 @@ namespace SpawnEditor2
 							this.axUOMap.AddDrawRect(xleft2, ytop2, width2, height2, 1, SpawnEditor.ComputeSpeedColor(spawnPointNode.Spawn));
 						}
 						SpawnPoint spawn = spawnPointNode.Spawn;
-						AxUOMap axUOMap = this.axUOMap;
+						UOMapControl axUOMap = this.axUOMap;
 						int num2 = (int)((short)spawnPointNode.Spawn.Bounds.X);
 						int num3 = (int)((short)spawnPointNode.Spawn.Bounds.Y);
 						int num4 = (int)((short)spawnPointNode.Spawn.Bounds.Width);
@@ -2539,7 +2468,7 @@ namespace SpawnEditor2
 								this.axUOMap.AddDrawRect(xleft4, ytop4, width4, height4, 1, SpawnEditor.ComputeSpeedColor(spawnPointNode.Spawn));
 							}
 							SpawnPoint spawn2 = spawnPointNode.Spawn;
-							AxUOMap axUOMap2 = this.axUOMap;
+							UOMapControl axUOMap2 = this.axUOMap;
 							int num8 = (int)((short)spawnPointNode.Spawn.Bounds.X);
 							int num9 = (int)((short)spawnPointNode.Spawn.Bounds.Y);
 							int num10 = (int)((short)spawnPointNode.Spawn.Bounds.Width);
@@ -3301,6 +3230,70 @@ namespace SpawnEditor2
 					FileStream fileStream;
 					try
 					{
+						// Dump CalibrationInfo list (if available) for diagnostics
+						try
+						{
+							var asmList = AppDomain.CurrentDomain.GetAssemblies();
+							Type calType = null;
+							foreach (var a in asmList)
+							{
+								calType = a.GetType("Ultima.CalibrationInfo");
+								if (calType != null) break;
+							}
+							if (calType == null)
+							{
+								SpawnEditor.LogWarning("TrackerLoop: CalibrationInfo type not found in loaded assemblies");
+							}
+							else
+							{
+								MethodInfo getList = calType.GetMethod("GetList", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+								object listObj = null;
+								if (getList != null)
+								{
+									listObj = getList.Invoke(null, null);
+								}
+								else
+								{
+									FieldInfo defField = calType.GetField("m_DefaultList", BindingFlags.Static | BindingFlags.NonPublic);
+									if (defField != null) listObj = defField.GetValue(null);
+								}
+								if (listObj == null)
+								{
+									SpawnEditor.LogWarning("TrackerLoop: CalibrationInfo list not available (GetList/m_DefaultList returned null)");
+								}
+								else
+								{
+									var ie = listObj as System.Collections.IEnumerable;
+									int idx = 0;
+									foreach (var entry in ie)
+									{
+										if (idx >= 8) break;
+										Type et = entry.GetType();
+										StringBuilder sb = new StringBuilder();
+										sb.Append("CalibrationEntry[" + idx + "] Type=" + et.FullName + " ");
+										foreach (var f in et.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+										{
+											object val = null;
+											try { val = f.GetValue(entry); } catch { val = "<err>"; }
+											sb.Append(f.Name + "=" + (val ?? "<null>") + " ");
+										}
+										foreach (var p in et.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+										{
+											object val = null;
+											try { val = p.GetValue(entry, null); } catch { val = "<err>"; }
+											sb.Append(p.Name + "=" + (val ?? "<null>") + " ");
+										}
+										SpawnEditor.LogWarning(sb.ToString());
+										idx++;
+									}
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							SpawnEditor.LogWarning("TrackerLoop: dumping CalibrationInfo failed: " + ex.Message);
+						}
+						
 						fileStream = File.Open(FilePath, FileMode.Create, FileAccess.Write);
 					}
 					catch (Exception ex)
@@ -3585,258 +3578,176 @@ namespace SpawnEditor2
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			this.Tracking = false;
+			try { this.StopAuthPosTimer(); } catch { }
 			base.OnClosing(e);
 		}
 
 		// Token: 0x060000D6 RID: 214 RVA: 0x0001CFC6 File Offset: 0x0001B1C6
 		public void ActivateTracking()
 		{
-			Client.Calibrate();
+			string windowConfig = this._CfgDialog.CfgUoClientWindowValue;
+			int pid;
+			if (int.TryParse(windowConfig, out pid) && pid > 0)
+			{
+				// PID mode: inject the HWND into Ultima.Client, then calibrate
+				if (this.EnsureClientHandle())
+				{
+					Client.Calibrate();
+				}
+			}
+			else
+			{
+				// Legacy window-name mode
+				Client.Calibrate();
+			}
 			new Thread(new ThreadStart(new SpawnEditor.TrackerThread(this).TrackerThreadMain))
 			{
 				Name = "Tracker Thread"
 			}.Start();
+
+			// start auth-position poller only if Track flag is enabled
+			try
+			{
+				if (this.Tracking || (this.chkTracking != null && this.chkTracking.Checked))
+				{
+					this.StartAuthPosTimer();
+				}
+			}
+			catch { }
+		}
+
+		private void StartAuthPosTimer()
+		{
+			if (this._AuthPosTimer != null) return;
+			this._AuthPosTimer = new System.Threading.Timer((s) => { try { this.QueryAndHandleAuthPosition(); } catch { } }, null, 0, this._AuthPosIntervalMs);
+		}
+
+		private void StopAuthPosTimer()
+		{
+			try
+			{
+				if (this._AuthPosTimer != null)
+				{
+					this._AuthPosTimer.Dispose();
+					this._AuthPosTimer = null;
+				}
+			}
+			catch { }
+		}
+
+		private void QueryAndHandleAuthPosition()
+		{
+			try
+			{
+				if (this._TransferDialog == null) return;
+				string addr = this._TransferDialog.txtTransferServerAddress.Text;
+				int port = 8032;
+				try { port = int.Parse(this._TransferDialog.txtTransferServerPort.Text); } catch { }
+				// debug log removed
+				QueryAuthPosition q = new QueryAuthPosition();
+				q.AuthenticationID = this.SessionID;
+				q.UseMainThread = true;
+				TransferMessage resp = null;
+				try { resp = TransferConnection.ProcessMessage(addr, port, q); } catch (Exception ex) { SpawnEditor.LogWarning("AuthPoll: ProcessMessage failed: " + ex.Message); return; }
+				if (resp == null) { SpawnEditor.LogWarning("AuthPoll: null response"); return; }
+				if (resp is ReturnAuthPosition)
+				{
+					ReturnAuthPosition r = (ReturnAuthPosition)resp;
+					this.Invoke((MethodInvoker)delegate {
+						this.MyLocation.X = r.X;
+						this.MyLocation.Y = r.Y;
+						this.MyLocation.Z = r.Z;
+						this.MyLocation.Facet = r.Map;
+						this.DisplayMyLocation();
+					});
+					SpawnEditor.LogWarning("AuthPoll: X=" + r.X + " Y=" + r.Y + " Z=" + r.Z + " Map=" + r.Map);
+				}
+				else if (resp is ErrorMessage)
+				{
+					SpawnEditor.LogWarning("AuthPoll: Error - " + ((ErrorMessage)resp).Message);
+				}
+			}
+			catch (Exception ex)
+			{
+				SpawnEditor.LogWarning("QueryAndHandleAuthPosition exception: " + ex.Message);
+			}
 		}
 
 		// Token: 0x060000D7 RID: 215 RVA: 0x0001CFF4 File Offset: 0x0001B1F4
 		public void UpdateMyLocation()
 		{
-			SpawnEditor.Debug("=== UpdateMyLocation() STARTED ===");
-			int x = 0;
-			int y = 0;
-			int z = 0;
-			int facet = -1;
-			
-			// Try memory-based location reading first (no HWND required)
-			SpawnEditor.Debug("Trying memory-based location reading...");
-			if (this.TryGetLocationFromMemory(ref x, ref y, ref z, ref facet))
+			// Server-only tracking mode: disable legacy memory-based reading and
+			// use the server poller to obtain authenticated player position.
+			SpawnEditor.Debug("=== UpdateMyLocation() STARTED (server-only) ===");
+			try
 			{
-				SpawnEditor.Debug(string.Format("Memory reading SUCCESS: X={0}, Y={1}, Z={2}, Facet={3}", x, y, z, facet));
-				this.cbxMap.SelectedIndex = facet;
-				this.AssignCenter((short)x, (short)y, (short)facet);
+				// Query the server and let QueryAndHandleAuthPosition update MyLocation/UI.
+				this.QueryAndHandleAuthPosition();
 			}
-			else
+			catch (Exception ex)
 			{
-				SpawnEditor.Debug("Memory reading FAILED, trying fallback to Client.FindLocation...");
-				// Fallback to original Client.FindLocation method
-				Client.Calibrate();
-				SpawnEditor.Debug("Client.Calibrate() called");
-				if (Client.FindLocation(ref x, ref y, ref z, ref facet))
-				{
-					SpawnEditor.Debug(string.Format("Client.FindLocation SUCCESS: X={0}, Y={1}, Z={2}, Facet={3}", x, y, z, facet));
-					this.cbxMap.SelectedIndex = facet;
-					this.AssignCenter((short)x, (short)y, (short)facet);
-				}
-				else
-				{
-					SpawnEditor.Debug("Client.FindLocation FAILED - showing error message");
-					MessageBox.Show(string.Format("{0} could not be found. Make sure the client is started and that the 'Client Window' option in Setup is correct.", this._CfgDialog.CfgUoClientWindowValue + " Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
-				}
+				SpawnEditor.LogWarning("UpdateMyLocation: server query failed: " + ex.Message);
 			}
-			this.MyLocation.X = x;
-			this.MyLocation.Y = y;
-			this.MyLocation.Z = z;
-			this.MyLocation.Facet = facet;
-			SpawnEditor.Debug(string.Format("=== UpdateMyLocation() COMPLETED: Final location X={0}, Y={1}, Z={2}, Facet={3} ===", x, y, z, facet));
+			SpawnEditor.Debug("=== UpdateMyLocation() COMPLETED (server-only) ===");
 		}
 
-		private bool TryGetLocationFromMemory(ref int x, ref int y, ref int z, ref int facet)
+		internal bool TryGetLocationFromMemory(ref int x, ref int y, ref int z, ref int facet)
 		{
 			try
 			{
 				string windowConfig = this._CfgDialog.CfgUoClientWindowValue;
-				SpawnEditor.Debug("TryGetLocationFromMemory: windowConfig = '" + windowConfig + "'");
 				
-				if (!int.TryParse(windowConfig, out int pid) || pid <= 0)
+				int pid;
+				if (!int.TryParse(windowConfig, out pid) || pid <= 0)
 				{
-					SpawnEditor.Debug("TryGetLocationFromMemory: FAILED - windowConfig is not a valid PID");
-					return false; // Not a PID, can't read memory
-				}
-				
-				SpawnEditor.Debug("TryGetLocationFromMemory: PID = " + pid);
-
-				Process proc = Process.GetProcessById(pid);
-				if (proc == null || proc.HasExited)
-				{
-					SpawnEditor.Debug("TryGetLocationFromMemory: FAILED - Process not found or exited");
 					return false;
 				}
-				
-				SpawnEditor.Debug("TryGetLocationFromMemory: Process found - " + proc.ProcessName);
 
-				// Open the process for memory reading
-				IntPtr processHandle = OpenProcess(PROCESS_VM_READ, false, pid);
-				if (processHandle == IntPtr.Zero)
-				{
-					SpawnEditor.Debug("TryGetLocationFromMemory: FAILED - Cannot open process for memory reading");
-					return false;
-				}
-				
-				SpawnEditor.Debug("TryGetLocationFromMemory: Process opened successfully");
-
+				Process proc;
 				try
 				{
-					// For ClassicUO, try to find the Player Mobile structure
-					IntPtr playerMobileAddress = FindPlayerMobileAddress(processHandle);
-					if (playerMobileAddress != IntPtr.Zero)
+					proc = Process.GetProcessById(pid);
+				}
+				catch
+				{
+					return false;
+				}
+				if (proc == null || proc.HasExited)
+				{
+					return false;
+				}
+
+				// Try to parse coordinates from the window title if available
+				// Some clients include coordinates in the title bar
+				string title = proc.MainWindowTitle;
+				if (!string.IsNullOrEmpty(title))
+				{
+					// Look for coordinate patterns like (1234, 5678, 10) in title
+					var match = System.Text.RegularExpressions.Regex.Match(title,
+						@"\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(-?\d+)\s*\)");
+					if (match.Success)
 					{
-						SpawnEditor.Debug("TryGetLocationFromMemory: Player Mobile found at address 0x" + playerMobileAddress.ToString("X8"));
-						
-						// Read location data from Player Mobile structure
-						// Typical offsets for ClassicUO (these may need adjustment for different versions)
-						const int offsetX = 0x2C;  // X coordinate offset
-						const int offsetY = 0x30;  // Y coordinate offset  
-						const int offsetZ = 0x34;  // Z coordinate offset
-						const int offsetFacet = 0x38; // Facet/Map offset
-
-						IntPtr addressX = IntPtr.Add(playerMobileAddress, offsetX);
-						IntPtr addressY = IntPtr.Add(playerMobileAddress, offsetY);
-						IntPtr addressZ = IntPtr.Add(playerMobileAddress, offsetZ);
-						IntPtr addressFacet = IntPtr.Add(playerMobileAddress, offsetFacet);
-
-						byte[] buffer = new byte[4];
-						IntPtr bytesRead;
-
-						if (ReadProcessMemory(processHandle, addressX, buffer, (IntPtr)4, out bytesRead))
+						x = int.Parse(match.Groups[1].Value);
+						y = int.Parse(match.Groups[2].Value);
+						z = int.Parse(match.Groups[3].Value);
+						// Facet not in title - keep current map selection
+						facet = this.cbxMap.SelectedIndex;
+						if (x >= 0 && x <= 8191 && y >= 0 && y <= 8191 && facet >= 0 && facet <= 5)
 						{
-							x = BitConverter.ToInt32(buffer, 0);
-						}
-						if (ReadProcessMemory(processHandle, addressY, buffer, (IntPtr)4, out bytesRead))
-						{
-							y = BitConverter.ToInt32(buffer, 0);
-						}
-						if (ReadProcessMemory(processHandle, addressZ, buffer, (IntPtr)4, out bytesRead))
-						{
-							z = BitConverter.ToInt32(buffer, 0);
-						}
-						if (ReadProcessMemory(processHandle, addressFacet, buffer, (IntPtr)4, out bytesRead))
-						{
-							facet = BitConverter.ToInt32(buffer, 0);
-						}
-
-						SpawnEditor.Debug(string.Format("TryGetLocationFromMemory: Read coordinates - X={0}, Y={1}, Z={2}, Facet={3}", x, y, z, facet));
-
-						// Validate coordinates are in reasonable UO ranges
-						if (x >= 0 && x <= 8191 && y >= 0 && y <= 8191 && z >= -128 && z <= 127 && facet >= 0 && facet <= 5)
-						{
-							SpawnEditor.Debug("TryGetLocationFromMemory: Coordinates validated successfully");
 							return true;
 						}
-						else
-						{
-							SpawnEditor.Debug("TryGetLocationFromMemory: FAILED - Coordinates out of valid range");
-							return false;
-						}
-					}
-					else
-					{
-						SpawnEditor.Debug("TryGetLocationFromMemory: FAILED - Player Mobile not found");
-						return false;
 					}
 				}
-				finally
-				{
-					CloseHandle(processHandle);
-					SpawnEditor.Debug("TryGetLocationFromMemory: Process handle closed");
-				}
-			}
-			catch (Exception ex)
-			{
-				SpawnEditor.Debug("TryGetLocationFromMemory: EXCEPTION - " + ex.Message);
+
+				// If title parsing failed, do not attempt process memory scanning.
+				// Memory-based scanning has been removed; rely on server-provided position only.
+				SpawnEditor.LogWarning("TryGetLocationFromMemory: memory scan disabled by configuration");
 				return false;
 			}
-		}
-
-		private IntPtr FindPlayerMobileAddress(IntPtr processHandle)
-		{
-			try
-			{
-				SpawnEditor.Debug("FindPlayerMobileAddress: Starting search for player mobile...");
-				
-				// For ClassicUO, the player mobile address can often be found by searching for
-				// specific patterns in memory. This is a simplified implementation.
-				
-				// One approach: Look for the player serial (typically 0x00000001 for player)
-				byte[] searchPattern = new byte[] { 0x01, 0x00, 0x00, 0x00 }; // Player serial
-				SpawnEditor.Debug("FindPlayerMobileAddress: Searching for player serial pattern...");
-				IntPtr foundAddress = SearchMemory(processHandle, searchPattern);
-				
-				if (foundAddress != IntPtr.Zero)
-				{
-					SpawnEditor.Debug("FindPlayerMobileAddress: Player serial found at 0x" + foundAddress.ToString("X8"));
-					// The player mobile structure typically starts a bit before the serial
-					// Adjust offset as needed for specific client version
-					IntPtr playerMobileAddr = IntPtr.Subtract(foundAddress, 0x10);
-					SpawnEditor.Debug("FindPlayerMobileAddress: Player mobile address calculated as 0x" + playerMobileAddr.ToString("X8"));
-					return playerMobileAddr;
-				}
-				else
-				{
-					SpawnEditor.Debug("FindPlayerMobileAddress: Player serial not found");
-				}
-				
-				return IntPtr.Zero;
-			}
 			catch (Exception ex)
 			{
-				SpawnEditor.Debug("FindPlayerMobileAddress: EXCEPTION - " + ex.Message);
-				return IntPtr.Zero;
-			}
-		}
-
-		private IntPtr SearchMemory(IntPtr processHandle, byte[] pattern)
-		{
-			try
-			{
-				SpawnEditor.Debug("SearchMemory: Starting search for pattern of " + pattern.Length + " bytes");
-				
-				byte[] buffer = new byte[4096];
-				IntPtr bytesRead;
-				
-				// Search in reasonable memory ranges
-				long minAddress = 0x00000000;
-				long maxAddress = 0x7FFFFFFF;
-				
-				SpawnEditor.Debug("SearchMemory: Scanning memory from 0x" + minAddress.ToString("X8") + " to 0x" + maxAddress.ToString("X8"));
-				
-				for (long address = minAddress; address < maxAddress; address += 4096)
-				{
-					if (ReadProcessMemory(processHandle, (IntPtr)address, buffer, (IntPtr)buffer.Length, out bytesRead))
-					{
-						for (int i = 0; i <= buffer.Length - pattern.Length; i++)
-						{
-							bool found = true;
-							for (int j = 0; j < pattern.Length; j++)
-							{
-								if (buffer[i + j] != pattern[j])
-								{
-									found = false;
-									break;
-								}
-							}
-							if (found)
-							{
-								IntPtr foundAddr = (IntPtr)(address + i);
-								SpawnEditor.Debug("SearchMemory: Pattern found at address 0x" + foundAddr.ToString("X8"));
-								return foundAddr;
-							}
-						}
-					}
-					
-					// Log progress every 1MB scanned
-					if ((address % 0x100000) == 0)
-					{
-						SpawnEditor.Debug("SearchMemory: Scanned up to 0x" + address.ToString("X8"));
-					}
-				}
-				
-				SpawnEditor.Debug("SearchMemory: Pattern not found in scanned memory");
-				return IntPtr.Zero;
-			}
-			catch (Exception ex)
-			{
-				SpawnEditor.Debug("SearchMemory: EXCEPTION - " + ex.Message);
-				return IntPtr.Zero;
+				SpawnEditor.LogWarning("TryGetLocationFromMemory failed: " + ex.Message);
+				return false;
 			}
 		}
 
@@ -3850,6 +3761,112 @@ namespace SpawnEditor2
 		private static extern bool CloseHandle(IntPtr hObject);
 
 		private const int PROCESS_VM_READ = 0x0010;
+		private const int CHUNK_SIZE = 0x10000; // 64KB
+		private bool _didTargetCoordSearch = false;
+
+		private string HexDump(byte[] buf, int start, int len)
+		{
+			if (buf == null) return "";
+			int end = Math.Min(buf.Length, start + len);
+			StringBuilder sb = new StringBuilder();
+			for (int i = start; i < end; i++)
+			{
+				sb.AppendFormat("{0:X2}", buf[i]);
+				if ((i - start + 1) % 16 == 0) sb.Append(" ");
+			}
+			return sb.ToString();
+		}
+
+		private void ScanForTargetCoordinatesOnce(int targetX, int targetY)
+		{
+			// Memory target scanning disabled.
+			this._didTargetCoordSearch = true;
+			SpawnEditor.LogWarning("ScanForTargetCoordinatesOnce: disabled (memory scanning removed)");
+			return;
+		}
+
+		private bool _didDiffScan = false;
+
+		private void ScanForChangingCoordinates(int sampleDelayMs)
+		{
+			// Memory difference scanning disabled.
+			this._didDiffScan = true;
+			SpawnEditor.LogWarning("ScanForChangingCoordinates: disabled (memory scanning removed)");
+			return;
+		}
+
+		private bool TryGetLocationFromMemoryByScan(int pid, out int outX, out int outY, out int outZ)
+		{
+			// Memory scanning disabled — return false to indicate no data.
+			outX = outY = outZ = 0;
+			SpawnEditor.LogWarning("TryGetLocationFromMemoryByScan: disabled (memory scanning removed)");
+			return false;
+		}
+
+		/// <summary>
+		/// If config contains a PID, inject the process MainWindowHandle into
+		/// Ultima.Client.m_Handle via reflection so that Client.Calibrate/FindLocation
+		/// can work with ClassicUO and other non-standard clients.
+		/// Returns true if the client handle is valid after the call.
+		/// </summary>
+		internal bool EnsureClientHandle()
+		{
+			try
+			{
+				string windowConfig = this._CfgDialog.CfgUoClientWindowValue;
+				int pid;
+				if (!int.TryParse(windowConfig, out pid) || pid <= 0)
+				{
+					return false;
+				}
+
+				Process proc;
+				try
+				{
+					proc = Process.GetProcessById(pid);
+				}
+				catch
+				{
+					return false;
+				}
+				if (proc == null || proc.HasExited || proc.MainWindowHandle == IntPtr.Zero)
+				{
+					return false;
+				}
+
+				// Inject the HWND into Ultima.Client.m_Handle via reflection
+				FieldInfo handleField = typeof(Client).GetField("m_Handle",
+					BindingFlags.Static | BindingFlags.NonPublic);
+				if (handleField == null)
+				{
+					SpawnEditor.LogWarning("EnsureClientHandle: Ultima.Client.m_Handle field not found via reflection");
+				}
+				else
+				{
+					try
+					{
+						IntPtr currentHandle = (IntPtr)handleField.GetValue(null);
+						SpawnEditor.LogWarning("EnsureClientHandle: currentHandle=" + currentHandle + " proc.MainWindowHandle=" + proc.MainWindowHandle);
+						if (currentHandle != proc.MainWindowHandle)
+						{
+							handleField.SetValue(null, proc.MainWindowHandle);
+							SpawnEditor.LogWarning("EnsureClientHandle: m_Handle updated to proc.MainWindowHandle");
+						}
+					}
+					catch (Exception ex)
+					{
+						SpawnEditor.LogWarning("EnsureClientHandle: reflection set/get failed: " + ex.Message);
+					}
+				}
+				SpawnEditor.LogWarning("EnsureClientHandle: Client.Running=" + Client.Running);
+				return Client.Running;
+			}
+			catch (Exception ex)
+			{
+				SpawnEditor.LogWarning("EnsureClientHandle failed: " + ex.Message);
+				return false;
+			}
+		}
 
 		// Token: 0x060000D8 RID: 216 RVA: 0x0001D09C File Offset: 0x0001B29C
 		public void DisplayMyLocation()
@@ -3861,6 +3878,14 @@ namespace SpawnEditor2
 			this.axUOMap.RemoveDrawObjects();
 			this.axUOMap.AddDrawObject((short)this.MyLocation.X, (short)this.MyLocation.Y, 1, 12, 65280);
 			this.axUOMap.AddDrawObject((short)this.MyLocation.X, (short)this.MyLocation.Y, 3, 2, 255);
+
+			// Force immediate repaint so the marker updates in real-time
+			try
+			{
+				this.axUOMap.Invalidate();
+				this.axUOMap.Update();
+			}
+			catch { }
 		}
 
 		// Token: 0x060000D9 RID: 217 RVA: 0x0001D124 File Offset: 0x0001B324
@@ -4117,6 +4142,47 @@ namespace SpawnEditor2
 		[DllImport("User32.dll")]
 		public static extern bool SetForegroundWindow(int hWnd);
 
+		[DllImport("User32.dll")]
+		private static extern IntPtr GetForegroundWindow();
+
+		private void SendStringToWindow(int windowHandle, string text)
+		{
+			IntPtr previousForeground = GetForegroundWindow();
+
+			SetForegroundWindow(windowHandle);
+			System.Threading.Thread.Sleep(200);
+
+			// Send Enter to open chat line
+			SendKeys.SendWait("{ENTER}");
+			System.Threading.Thread.Sleep(150);
+
+			// Send each character individually to avoid SendKeys special char issues
+			foreach (char c in text)
+			{
+				// Escape SendKeys special characters: +^%~(){}
+				if (c == '+' || c == '^' || c == '%' || c == '~' ||
+				    c == '(' || c == ')' || c == '{' || c == '}')
+				{
+					SendKeys.SendWait("{" + c + "}");
+				}
+				else
+				{
+					SendKeys.SendWait(c.ToString());
+				}
+			}
+
+			// Send Enter to execute command
+			System.Threading.Thread.Sleep(100);
+			SendKeys.SendWait("{ENTER}");
+			System.Threading.Thread.Sleep(100);
+
+			// Restore previous window focus
+			if (previousForeground != IntPtr.Zero)
+			{
+				SetForegroundWindow(previousForeground.ToInt32());
+			}
+		}
+
 		// Token: 0x060000E7 RID: 231 RVA: 0x0001D848 File Offset: 0x0001BA48
 		public void SendGoCommand(SpawnPoint Spawn)
 		{
@@ -4224,17 +4290,10 @@ namespace SpawnEditor2
 			if (window > 0)
 			{
 				string str = string.Format("{0}XTS auth {1}", this._CfgDialog.CfgRunUoCmdPrefix, id.ToString());
-				SpawnEditor.SendMessage(window, 258, 13, 0);
-				for (int index = 0; index < str.Length; index++)
-				{
-					SpawnEditor.SendMessage(window, 256, 69, 1);
-					SpawnEditor.SendMessage(window, 258, (int)str[index], 1);
-					SpawnEditor.SendMessage(window, 257, 69, 1);
-				}
-				SpawnEditor.SendMessage(window, 258, 13, 0);
+				this.SendStringToWindow(window, str);
 				return;
 			}
-			MessageBox.Show(string.Format("{0} could not be found. Make sure the client is started and that the 'Client Window' option in Setup is correct.", this._CfgDialog.CfgUoClientWindowValue + " Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
+			MessageBox.Show("Client process not found or not responding.\nMake sure the UO client is running and selected in Setup.", "Client Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 		}
 
 		// Token: 0x060000E9 RID: 233 RVA: 0x0001D9D4 File Offset: 0x0001BBD4
@@ -4266,21 +4325,15 @@ namespace SpawnEditor2
 						Z
 					});
 				}
-				SpawnEditor.SendMessage(window, 258, 13, 0);
-				for (int index = 0; index < str2.Length; index++)
-				{
-					SpawnEditor.SendMessage(window, 256, 69, 1);
-					SpawnEditor.SendMessage(window, 258, (int)str2[index], 1);
-					SpawnEditor.SendMessage(window, 257, 69, 1);
-				}
-				SpawnEditor.SendMessage(window, 258, 13, 0);
+				SpawnEditor.SetForegroundWindow(window);
+			this.SendStringToWindow(window, str2);
 				this.MyLocation.X = (int)X;
 				this.MyLocation.Y = (int)Y;
 				this.MyLocation.Z = (int)Z;
 				this.MyLocation.Facet = (int)Map;
 				return;
 			}
-			MessageBox.Show(string.Format("{0} could not be found. Make sure the client is started and that the 'Client Window' option in Setup is correct.", this._CfgDialog.CfgUoClientWindowValue + " Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
+			MessageBox.Show("Client process not found or not responding.\nMake sure the UO client is running and selected in Setup.", "Client Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 			this.chkSyncUO.Checked = false;
 		}
 
@@ -4455,6 +4508,7 @@ namespace SpawnEditor2
 				return;
 			}
 			this.Tracking = false;
+			try { this.StopAuthPosTimer(); } catch { }
 			this.axUOMap.RemoveDrawObjects();
 			this.RefreshSpawnPoints();
 		}
@@ -5998,11 +6052,21 @@ namespace SpawnEditor2
 			{
 			}
 			this._TransferDialog.DisplayStatusIndicator("Sending Spawners...");
+			SpawnEditor.LogWarning(string.Format("SendSpawners request: server={0}:{1}, selectedOnly={2}, authId={3}, payloadBytes={4}", text, Port, selectedspawn != null, saveSpawnerData.AuthenticationID, (saveSpawnerData.Data != null) ? saveSpawnerData.Data.Length : 0));
 			TransferMessage transferMessage = TransferConnection.ProcessMessage(text, Port, saveSpawnerData);
+			if (transferMessage == null)
+			{
+				SpawnEditor.LogWarning("SendSpawners response: <null>");
+			}
+			else
+			{
+				SpawnEditor.LogWarning("SendSpawners response type: " + transferMessage.GetType().FullName);
+			}
 			if (transferMessage is ReturnSpawnerSaveStatus)
 			{
 				int num2 = ((ReturnSpawnerSaveStatus)transferMessage).ProcessedSpawners;
 				int processedMaps = ((ReturnSpawnerSaveStatus)transferMessage).ProcessedMaps;
+				SpawnEditor.LogWarning(string.Format("SendSpawners success: processedSpawners={0}, processedMaps={1}", num2, processedMaps));
 				if (num2 == 0)
 				{
 					MessageBox.Show(this, "No Spawners sent.", "Empty Send", MessageBoxButtons.OK, MessageBoxIcon.Hand);
@@ -6011,6 +6075,10 @@ namespace SpawnEditor2
 				{
 					MessageBox.Show(string.Format("Successfully sent {0} spawners", num2));
 				}
+			}
+			else if (transferMessage is ErrorMessage)
+			{
+				SpawnEditor.LogWarning("SendSpawners error: " + ((ErrorMessage)transferMessage).Message);
 			}
 			this._TransferDialog.HideStatusIndicator();
 		}
@@ -6493,7 +6561,7 @@ namespace SpawnEditor2
 		}
 
 		// Token: 0x040000F9 RID: 249
-		private static bool _Debug = true;
+		private static bool _Debug = false;
 
 		// Token: 0x040000FA RID: 250
 		private static ArrayList AssemblyList = new ArrayList();
@@ -6624,6 +6692,10 @@ namespace SpawnEditor2
 		// Token: 0x0400026D RID: 621
 		private static int tictoc = 0;
 
+		// Timer to poll server for authenticated player's position
+		private System.Threading.Timer _AuthPosTimer;
+		private int _AuthPosIntervalMs = 1000;
+
 		// Token: 0x02000030 RID: 48
 		internal class CustomExceptionHandler
 		{
@@ -6685,7 +6757,69 @@ namespace SpawnEditor2
 					int y = 0;
 					int z = 0;
 					int facet = -1;
-					if (Client.FindLocation(ref x, ref y, ref z, ref facet))
+					bool found = this.Editor.TryGetLocationFromMemory(ref x, ref y, ref z, ref facet);
+					SpawnEditor.LogWarning("TrackerLoop: TryGetLocationFromMemory returned=" + found + " (cfg=" + this.Editor._CfgDialog.CfgUoClientWindowValue + ")");
+					if (!found)
+					{
+						bool ensured = this.Editor.EnsureClientHandle();
+						SpawnEditor.LogWarning("TrackerLoop: EnsureClientHandle returned=" + ensured + " Client.Running=" + Client.Running);
+						if (ensured)
+						{
+							try { this.Editor.ScanForTargetCoordinatesOnce(5557, 1207); } catch { }
+							try { this.Editor.ScanForTargetCoordinatesOnce(5597, 1185); } catch { }
+							try { this.Editor.ScanForChangingCoordinates(500); } catch { }
+						}
+						try
+						{
+							// Ensure calibration has been run for the current client handle before attempting FindLocation
+							// inspect ProcessStream status before calibrate
+							try
+							{
+								object ps = Client.ProcessStream;
+								if (ps == null)
+									SpawnEditor.LogWarning("TrackerLoop: Client.ProcessStream == null before Calibrate()");
+								else
+								{
+									SpawnEditor.LogWarning("TrackerLoop: Client.ProcessStream != null before Calibrate(): type=" + ps.GetType().FullName);
+									try
+									{
+										var prop = ps.GetType().GetProperty("Window", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+										if (prop != null)
+									{
+										object wnd = prop.GetValue(ps, null);
+										SpawnEditor.LogWarning("TrackerLoop: ProcessStream.Window=" + (wnd ?? "<null>"));
+									}
+									}
+									catch (Exception ex)
+									{
+										SpawnEditor.LogWarning("TrackerLoop: reading ProcessStream.Window failed: " + ex.Message);
+									}
+								}
+							}
+							catch (Exception ex)
+							{
+								SpawnEditor.LogWarning("TrackerLoop: inspecting ProcessStream failed: " + ex.Message);
+							}
+							Client.Calibrate();
+							SpawnEditor.LogWarning("TrackerLoop: Client.Calibrate() called");
+							var lp = Client.LocationPointer;
+							if (lp == null)
+							{
+								SpawnEditor.LogWarning("TrackerLoop: LocationPointer is null after Calibrate()");
+							}
+							else
+							{
+								SpawnEditor.LogWarning("TrackerLoop: LocationPointer PointerX=" + lp.PointerX + " SizeX=" + lp.SizeX + " PointerY=" + lp.PointerY + " SizeY=" + lp.SizeY);
+							}
+						}
+						catch (Exception ex)
+						{
+							SpawnEditor.LogWarning("TrackerLoop: Client.Calibrate() threw: " + ex.Message);
+						}
+						found = Client.FindLocation(ref x, ref y, ref z, ref facet);
+						SpawnEditor.LogWarning("TrackerLoop: Client.FindLocation returned=" + found + " -> X=" + x + " Y=" + y + " Z=" + z + " Facet=" + facet);
+					}
+					if (found)
 					{
 						if (facet != num3 || x != num || y != num2)
 						{
@@ -6708,9 +6842,17 @@ namespace SpawnEditor2
 					}
 					else
 					{
-						MessageBox.Show(string.Format("{0}. Make sure the client is started and that the 'Client Window' option in Setup is correct.", this.Editor._CfgDialog.CfgUoClientWindowValue + " Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
-						this.Editor.Tracking = false;
-						this.Editor.chkTracking.Checked = false;
+						SpawnEditor.LogWarning("Tracker: Client not found (PID: " + this.Editor._CfgDialog.CfgUoClientWindowValue + ")");
+						// If server-side auth polling is active, keep Track enabled so server updates continue.
+						if (this.Editor._AuthPosTimer == null)
+						{
+							this.Editor.Tracking = false;
+							this.Editor.chkTracking.Checked = false;
+						}
+						else
+						{
+							SpawnEditor.LogWarning("Tracker: Client not found but auth poller active; keeping Track enabled");
+						}
 					}
 				}
 			}

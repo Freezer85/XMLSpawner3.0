@@ -45,7 +45,8 @@
 			this.txtCmdPrefix = new global::System.Windows.Forms.TextBox();
 			this.lblCmdPrefix = new global::System.Windows.Forms.Label();
 			this.lblClientWindow = new global::System.Windows.Forms.Label();
-			this.txtClientWindow = new global::System.Windows.Forms.TextBox();
+			this.cmbClientProcess = new global::System.Windows.Forms.ComboBox();
+			this.btnRefreshProcesses = new global::System.Windows.Forms.Button();
 			this.btnPickClientWindow = new global::System.Windows.Forms.Button();
 			this.startingStatics = new global::System.Windows.Forms.CheckBox();
 			this.startingDetails = new global::System.Windows.Forms.CheckBox();
@@ -99,14 +100,35 @@
 			this.btnUltimaClient.TabIndex = 5;
 			this.btnUltimaClient.Text = "...";
 			this.btnUltimaClient.Click += new global::System.EventHandler(this.btnUltimaClient_Click);
-			this.label1.Location = new global::System.Drawing.Point(8, 64);
+			this.lblMulPath = new global::System.Windows.Forms.Label();
+			this.lblMulPath.Location = new global::System.Drawing.Point(8, 56);
+			this.lblMulPath.Name = "lblMulPath";
+			this.lblMulPath.Size = new global::System.Drawing.Size(80, 20);
+			this.lblMulPath.TabIndex = 20;
+			this.lblMulPath.Text = "MUL Files:";
+			this.lblMulPath.TextAlign = global::System.Drawing.ContentAlignment.MiddleLeft;
+			this.txtMulPath = new global::System.Windows.Forms.TextBox();
+			this.txtMulPath.Location = new global::System.Drawing.Point(80, 56);
+			this.txtMulPath.Name = "txtMulPath";
+			this.txtMulPath.ReadOnly = true;
+			this.txtMulPath.Size = new global::System.Drawing.Size(208, 20);
+			this.txtMulPath.TabIndex = 21;
+			this.txtMulPath.Text = "";
+			this.btnMulPath = new global::System.Windows.Forms.Button();
+			this.btnMulPath.Location = new global::System.Drawing.Point(288, 56);
+			this.btnMulPath.Name = "btnMulPath";
+			this.btnMulPath.Size = new global::System.Drawing.Size(24, 20);
+			this.btnMulPath.TabIndex = 22;
+			this.btnMulPath.Text = "...";
+			this.btnMulPath.Click += new global::System.EventHandler(this.btnMulPath_Click);
+			this.label1.Location = new global::System.Drawing.Point(8, 88);
 			this.label1.Name = "label1";
 			this.label1.Size = new global::System.Drawing.Size(112, 20);
 			this.label1.TabIndex = 6;
 			this.label1.Text = "Default Zoom Level:";
 			this.label1.TextAlign = global::System.Drawing.ContentAlignment.MiddleLeft;
 			this.trkZoom.LargeChange = 2;
-			this.trkZoom.Location = new global::System.Drawing.Point(112, 56);
+			this.trkZoom.Location = new global::System.Drawing.Point(112, 80);
 			this.trkZoom.Maximum = 4;
 			this.trkZoom.Minimum = -4;
 			this.trkZoom.Name = "trkZoom";
@@ -127,7 +149,7 @@
 			this.grpSpawnEdit.Controls.Add(this.chkSpawnGroup);
 			this.grpSpawnEdit.Controls.Add(this.spnSpawnMaxDelay);
 			this.grpSpawnEdit.Controls.Add(this.lblMinDelay);
-			this.grpSpawnEdit.Location = new global::System.Drawing.Point(112, 104);
+			this.grpSpawnEdit.Location = new global::System.Drawing.Point(112, 128);
 			this.grpSpawnEdit.Name = "grpSpawnEdit";
 			this.grpSpawnEdit.Size = new global::System.Drawing.Size(152, 200);
 			this.grpSpawnEdit.TabIndex = 10;
@@ -255,63 +277,70 @@
 			this.lblMinDelay.Size = new global::System.Drawing.Size(80, 16);
 			this.lblMinDelay.TabIndex = 5;
 			this.lblMinDelay.Text = "Min Delay (m)";
-			this.btnOk.Location = new global::System.Drawing.Point(112, 368);
+			this.btnOk.Location = new global::System.Drawing.Point(112, 392);
 			this.btnOk.Name = "btnOk";
 			this.btnOk.TabIndex = 11;
 			this.btnOk.Text = "&Ok";
 			this.btnOk.Click += new global::System.EventHandler(this.btnOk_Click);
 			this.btnCancel.DialogResult = global::System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new global::System.Drawing.Point(192, 368);
+			this.btnCancel.Location = new global::System.Drawing.Point(192, 392);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.TabIndex = 12;
 			this.btnCancel.Text = "&Cancel";
-			this.txtCmdPrefix.Location = new global::System.Drawing.Point(8, 120);
+			this.txtCmdPrefix.Location = new global::System.Drawing.Point(8, 144);
 			this.txtCmdPrefix.Name = "txtCmdPrefix";
 			this.txtCmdPrefix.Size = new global::System.Drawing.Size(96, 20);
 			this.txtCmdPrefix.TabIndex = 9;
 			this.txtCmdPrefix.Text = "[";
-			this.lblCmdPrefix.Location = new global::System.Drawing.Point(8, 104);
+			this.lblCmdPrefix.Location = new global::System.Drawing.Point(8, 128);
 			this.lblCmdPrefix.Name = "lblCmdPrefix";
 			this.lblCmdPrefix.Size = new global::System.Drawing.Size(96, 16);
 			this.lblCmdPrefix.TabIndex = 8;
 			this.lblCmdPrefix.Text = "Command Prefix:";
-			this.lblClientWindow.Location = new global::System.Drawing.Point(8, 152);
+			this.lblClientWindow.Location = new global::System.Drawing.Point(8, 176);
 			this.lblClientWindow.Name = "lblClientWindow";
-			this.lblClientWindow.Size = new global::System.Drawing.Size(120, 16);
+			this.lblClientWindow.Size = new global::System.Drawing.Size(200, 16);
 			this.lblClientWindow.TabIndex = 13;
-			this.lblClientWindow.Text = "Client PID/Window:";
-			this.txtClientWindow.Location = new global::System.Drawing.Point(8, 168);
-			this.txtClientWindow.Name = "txtClientWindow";
-			this.txtClientWindow.Size = new global::System.Drawing.Size(96, 20);
-			this.txtClientWindow.TabIndex = 14;
-			this.txtClientWindow.Text = "Ultima Online";
-			this.btnPickClientWindow.Location = new global::System.Drawing.Point(112, 168);
+			this.lblClientWindow.Text = "Client Process (PID):";
+			this.cmbClientProcess.DropDownStyle = global::System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cmbClientProcess.Location = new global::System.Drawing.Point(8, 192);
+			this.cmbClientProcess.Name = "cmbClientProcess";
+			this.cmbClientProcess.Size = new global::System.Drawing.Size(200, 21);
+			this.cmbClientProcess.TabIndex = 14;
+			this.cmbClientProcess.SelectedIndexChanged += new global::System.EventHandler(this.cmbClientProcess_SelectedIndexChanged);
+			this.btnRefreshProcesses.Location = new global::System.Drawing.Point(212, 192);
+			this.btnRefreshProcesses.Name = "btnRefreshProcesses";
+			this.btnRefreshProcesses.Size = new global::System.Drawing.Size(50, 21);
+			this.btnRefreshProcesses.TabIndex = 15;
+			this.btnRefreshProcesses.Text = "Refresh";
+			this.btnRefreshProcesses.Click += new global::System.EventHandler(this.btnRefreshProcesses_Click);
+			this.btnPickClientWindow.Location = new global::System.Drawing.Point(266, 192);
 			this.btnPickClientWindow.Name = "btnPickClientWindow";
-			this.btnPickClientWindow.Size = new global::System.Drawing.Size(80, 20);
-			this.btnPickClientWindow.TabIndex = 15;
-			this.btnPickClientWindow.Text = "Seleziona";
+			this.btnPickClientWindow.Size = new global::System.Drawing.Size(44, 21);
+			this.btnPickClientWindow.TabIndex = 16;
+			this.btnPickClientWindow.Text = "Pick";
 			this.btnPickClientWindow.Click += new global::System.EventHandler(this.btnPickClientWindow_Click);
-			this.startingStatics.Location = new global::System.Drawing.Point(8, 216);
+			this.startingStatics.Location = new global::System.Drawing.Point(8, 240);
 			this.startingStatics.Name = "startingStatics";
 			this.startingStatics.Size = new global::System.Drawing.Size(96, 16);
 			this.startingStatics.TabIndex = 15;
 			this.startingStatics.Text = "Statics";
-			this.startingDetails.Location = new global::System.Drawing.Point(8, 232);
+			this.startingDetails.Location = new global::System.Drawing.Point(8, 256);
 			this.startingDetails.Name = "startingDetails";
 			this.startingDetails.Size = new global::System.Drawing.Size(96, 16);
 			this.startingDetails.TabIndex = 16;
 			this.startingDetails.Text = "Details";
 			this.startingMap.DropDownStyle = global::System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.startingMap.Location = new global::System.Drawing.Point(8, 272);
+			this.startingMap.Location = new global::System.Drawing.Point(8, 296);
 			this.startingMap.Name = "startingMap";
 			this.startingMap.Size = new global::System.Drawing.Size(77, 21);
 			this.startingMap.TabIndex = 17;
-			this.label2.Location = new global::System.Drawing.Point(8, 200);
+			this.label2.Location = new global::System.Drawing.Point(8, 224);
 			this.label2.Name = "label2";
 			this.label2.Size = new global::System.Drawing.Size(88, 16);
 			this.label2.TabIndex = 18;
 			this.label2.Text = "On Startup:";
-			this.startingOnTop.Location = new global::System.Drawing.Point(8, 248);
+			this.startingOnTop.Location = new global::System.Drawing.Point(8, 272);
 			this.startingOnTop.Name = "startingOnTop";
 			this.startingOnTop.Size = new global::System.Drawing.Size(96, 16);
 			this.startingOnTop.TabIndex = 19;
@@ -319,14 +348,18 @@
 			base.AcceptButton = this.btnOk;
 			this.AutoScaleBaseSize = new global::System.Drawing.Size(5, 13);
 			base.CancelButton = this.btnCancel;
-			base.ClientSize = new global::System.Drawing.Size(314, 392);
+			base.ClientSize = new global::System.Drawing.Size(314, 416);
+			base.Controls.Add(this.btnMulPath);
+			base.Controls.Add(this.txtMulPath);
+			base.Controls.Add(this.lblMulPath);
 			base.Controls.Add(this.startingOnTop);
 			base.Controls.Add(this.label2);
 			base.Controls.Add(this.startingMap);
 			base.Controls.Add(this.startingDetails);
 			base.Controls.Add(this.startingStatics);
 			base.Controls.Add(this.btnPickClientWindow);
-			base.Controls.Add(this.txtClientWindow);
+			base.Controls.Add(this.btnRefreshProcesses);
+			base.Controls.Add(this.cmbClientProcess);
 			base.Controls.Add(this.lblClientWindow);
 			base.Controls.Add(this.lblCmdPrefix);
 			base.Controls.Add(this.txtCmdPrefix);
@@ -445,7 +478,9 @@
 		private global::System.Windows.Forms.Label lblClientWindow;
 
 		// Token: 0x0400007F RID: 127
-		private global::System.Windows.Forms.TextBox txtClientWindow;
+		private global::System.Windows.Forms.ComboBox cmbClientProcess;
+
+		private global::System.Windows.Forms.Button btnRefreshProcesses;
 
 		// Token: 0x04000080 RID: 128
 		private global::System.Windows.Forms.CheckBox startingStatics;
@@ -464,6 +499,12 @@
 
 		// Token: 0x04000085 RID: 133
 		private global::System.Windows.Forms.Button btnPickClientWindow;
+
+		private global::System.Windows.Forms.Label lblMulPath;
+
+		private global::System.Windows.Forms.TextBox txtMulPath;
+
+		private global::System.Windows.Forms.Button btnMulPath;
 
 		// Token: 0x04000086 RID: 134
 		private global::System.ComponentModel.IContainer components;

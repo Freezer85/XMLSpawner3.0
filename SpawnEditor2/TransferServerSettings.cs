@@ -280,10 +280,20 @@ namespace SpawnEditor2
 			{
 			}
 			this.DisplayStatusIndicator("Downloading Spawners...");
+			SpawnEditor.LogWarning(string.Format("GetSpawners request: server={0}:{1}, map={2}, withinSelection={3}, nameFilter='{4}', entryFilter='{5}', containerFilter={6}, smartFilter={7}, sequentialFilter={8}, proximity={9}, running={10}, modified={11}, modifiedBy={12}", text, Port, getSpawnerData.SelectedMap, this.chkSpawnerWithinSelectionWindow.Checked, getSpawnerData.NameFilter ?? string.Empty, getSpawnerData.EntryFilter ?? string.Empty, getSpawnerData.ContainerFilter, getSpawnerData.SmartSpawnFilter, getSpawnerData.SequentialFilter, getSpawnerData.Proximity, getSpawnerData.Running, getSpawnerData.Modified, getSpawnerData.ModifiedBy));
 			TransferMessage transferMessage = TransferConnection.ProcessMessage(text, Port, getSpawnerData);
+			if (transferMessage == null)
+			{
+				SpawnEditor.LogWarning("GetSpawners response: <null>");
+			}
+			else
+			{
+				SpawnEditor.LogWarning("GetSpawners response type: " + transferMessage.GetType().FullName);
+			}
 			if (transferMessage is ReturnSpawnerData)
 			{
 				byte[] data = ((ReturnSpawnerData)transferMessage).Data;
+				SpawnEditor.LogWarning(string.Format("GetSpawners payload length: {0}", (data != null) ? data.Length : 0));
 				if (data == null || data.Length == 0)
 				{
 					MessageBox.Show(this, "No Spawners found.", "Empty Download", MessageBoxButtons.OK, MessageBoxIcon.Hand);
@@ -292,6 +302,10 @@ namespace SpawnEditor2
 				{
 					this._Editor.LoadSpawnFile(new MemoryStream(data), null, WorldMap.Internal);
 				}
+			}
+			else if (transferMessage is ErrorMessage)
+			{
+				SpawnEditor.LogWarning("GetSpawners error: " + ((ErrorMessage)transferMessage).Message);
 			}
 			this.DisplayStatusIndicator("Updating Display...");
 			this._Editor.RefreshSpawnPoints();

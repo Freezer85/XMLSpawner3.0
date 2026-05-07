@@ -92,6 +92,7 @@ namespace SpawnEditor2
 			}
 			this.CfgRunUoPathValue = (string)this._HKCUKey.GetValue(this.AppRunUoPathValue, string.Empty);
 			this.CfgUoClientPathValue = (string)this._HKCUKey.GetValue(this.AppUoClientPathValue, string.Empty);
+			this.CfgMulPathValue = (string)this._HKCUKey.GetValue(this.AppMulPathValue, string.Empty);
 			this.CfgUoClientWindowValue = (string)this._HKCUKey.GetValue(this.AppUoClientWindowValue, "Ultima Online Third Dawn");
 			this.CfgZoomLevelValue = short.Parse(this._HKCUKey.GetValue(this.AppZoomLevelValue, "-4") as string);
 			this.CfgRunUoCmdPrefix = (string)this._HKCUKey.GetValue(this.AppRunUoCmdPrefixValue, "[");
@@ -142,6 +143,22 @@ namespace SpawnEditor2
 			this.SetClientWindowName();
 		}
 
+		private void btnMulPath_Click(object sender, EventArgs e)
+		{
+			using (var fbd = new global::System.Windows.Forms.FolderBrowserDialog())
+			{
+				fbd.Description = "Select the folder containing UO map files (map0.mul, statics0.mul, etc.)";
+				if (!string.IsNullOrEmpty(this.txtMulPath.Text) && Directory.Exists(this.txtMulPath.Text))
+				{
+					fbd.SelectedPath = this.txtMulPath.Text;
+				}
+				if (fbd.ShowDialog(this) == DialogResult.OK)
+				{
+					this.txtMulPath.Text = fbd.SelectedPath;
+				}
+			}
+		}
+
 		// Token: 0x06000025 RID: 37 RVA: 0x000058C4 File Offset: 0x00003AC4
 		private void Configure_Load(object sender, EventArgs e)
 		{
@@ -175,7 +192,9 @@ namespace SpawnEditor2
 			}
 			this.txtRunUOExe.Text = this.CfgRunUoPathValue;
 			this.txtUltimaClient.Text = this.CfgUoClientPathValue;
-			this.txtClientWindow.Text = this.CfgUoClientWindowValue;
+			this.txtMulPath.Text = this.CfgMulPathValue;
+			this.RefreshProcessList();
+			this.SelectProcessByConfig(this.CfgUoClientWindowValue);
 			this.trkZoom.Value = (int)this.CfgZoomLevelValue;
 			this.txtCmdPrefix.Text = this.CfgRunUoCmdPrefix;
 			this.txtSpawnName.Text = this.CfgSpawnNameValue;
@@ -217,7 +236,8 @@ namespace SpawnEditor2
 					this.CfgUoClientWindowValue = "";
 				}
 			}
-			this.txtClientWindow.Text = this.CfgUoClientWindowValue;
+			this.RefreshProcessList();
+			this.SelectProcessByConfig(this.CfgUoClientWindowValue);
 		}
 
 		private string GetClientProcessIdByExe()
@@ -276,6 +296,9 @@ namespace SpawnEditor2
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern short GetAsyncKeyState(int vKey);
 
+		[System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+		private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+
 		private const uint GA_ROOT = 2u;
 		private const int VK_LBUTTON = 0x01;
 		private const int VK_ESCAPE = 0x1B;
@@ -302,9 +325,8 @@ namespace SpawnEditor2
 
 			this._isSelectingClientPid = true;
 			this._pickStartTime = DateTime.Now;
-			this.lblClientWindow.Text = "Clicca la finestra del client (Esc per annullare)";
+			this.lblClientWindow.Text = "Click the client window (Esc to cancel)";
 			this.Cursor = Cursors.Cross;
-			this.UseWaitCursor = true;
 			this._pickWindowTimer.Start();
 		}
 
@@ -357,7 +379,8 @@ namespace SpawnEditor2
 			}
 
 			this.CfgUoClientWindowValue = processId.ToString();
-			this.txtClientWindow.Text = this.CfgUoClientWindowValue;
+			this.RefreshProcessList();
+			this.SelectProcessByPid((int)processId);
 			this.EndPickWindowMode();
 		}
 
@@ -368,9 +391,152 @@ namespace SpawnEditor2
 			{
 				this._pickWindowTimer.Stop();
 			}
-			this.lblClientWindow.Text = "Client PID/Window:";
+			this.lblClientWindow.Text = "Client Process (PID):";
 			this.Cursor = Cursors.Default;
-			this.UseWaitCursor = false;
+		}
+
+		#endregion
+
+		#region Process List Helpers
+
+		private static readonly string[] KnownClientNames = new string[]
+		{
+			"client", "classicuo", "cuoclient", "uotd", "orion", "razor", "classicassist"
+		};
+
+		private void RefreshProcessList()
+		{
+			object previousSelection = this.cmbClientProcess.SelectedItem;
+			int previousPid = 0;
+			if (previousSelection is ClientProcessItem prev)
+			{
+				previousPid = prev.Pid;
+			}
+
+			this.cmbClientProcess.Items.Clear();
+			this.cmbClientProcess.Items.Add(new ClientProcessItem(0, "(none)", ""));
+
+			try
+			{
+				foreach (Process proc in Process.GetProcesses())
+				{
+					try
+					{
+						string name = proc.ProcessName.ToLowerInvariant();
+						bool isKnown = false;
+						foreach (string known in KnownClientNames)
+						{
+							if (name.Contains(known))
+							{
+								isKnown = true;
+								break;
+							}
+						}
+						if (!isKnown)
+						{
+							continue;
+						}
+
+						string title = "";
+						if (proc.MainWindowHandle != IntPtr.Zero)
+						{
+							title = proc.MainWindowTitle;
+						}
+						this.cmbClientProcess.Items.Add(new ClientProcessItem(proc.Id, proc.ProcessName, title));
+					}
+					catch { }
+				}
+			}
+			catch { }
+
+			// Try to re-select previous PID
+			if (previousPid > 0)
+			{
+				this.SelectProcessByPid(previousPid);
+			}
+			else
+			{
+				this.cmbClientProcess.SelectedIndex = 0;
+			}
+		}
+
+		private void SelectProcessByPid(int pid)
+		{
+			for (int i = 0; i < this.cmbClientProcess.Items.Count; i++)
+			{
+				if (this.cmbClientProcess.Items[i] is ClientProcessItem item && item.Pid == pid)
+				{
+					this.cmbClientProcess.SelectedIndex = i;
+					return;
+				}
+			}
+			// PID not in list — add it manually
+			if (pid > 0)
+			{
+				try
+				{
+					Process proc = Process.GetProcessById(pid);
+					string title = proc.MainWindowHandle != IntPtr.Zero ? proc.MainWindowTitle : "";
+					var item = new ClientProcessItem(proc.Id, proc.ProcessName, title);
+					this.cmbClientProcess.Items.Add(item);
+					this.cmbClientProcess.SelectedItem = item;
+				}
+				catch
+				{
+					this.cmbClientProcess.SelectedIndex = 0;
+				}
+			}
+		}
+
+		private void SelectProcessByConfig(string configValue)
+		{
+			if (string.IsNullOrEmpty(configValue))
+			{
+				this.cmbClientProcess.SelectedIndex = 0;
+				return;
+			}
+
+			// If config is a PID number, select by PID
+			int pid;
+			if (int.TryParse(configValue, out pid) && pid > 0)
+			{
+				this.SelectProcessByPid(pid);
+				return;
+			}
+
+			// Legacy: config is a window title — try to match by title
+			for (int i = 0; i < this.cmbClientProcess.Items.Count; i++)
+			{
+				if (this.cmbClientProcess.Items[i] is ClientProcessItem item
+					&& item.WindowTitle.IndexOf(configValue, StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					this.cmbClientProcess.SelectedIndex = i;
+					return;
+				}
+			}
+
+			// Select first real process if available, otherwise (none)
+			if (this.cmbClientProcess.Items.Count > 1)
+			{
+				this.cmbClientProcess.SelectedIndex = 1;
+			}
+			else
+			{
+				this.cmbClientProcess.SelectedIndex = 0;
+			}
+		}
+
+		private void cmbClientProcess_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (this.cmbClientProcess.SelectedItem is ClientProcessItem item && item.Pid > 0)
+			{
+				this.CfgUoClientWindowValue = item.Pid.ToString();
+			}
+		}
+
+		private void btnRefreshProcesses_Click(object sender, EventArgs e)
+		{
+			this.RefreshProcessList();
 		}
 
 		#endregion
@@ -380,7 +546,11 @@ namespace SpawnEditor2
 		{
 			this.CfgRunUoPathValue = this.txtRunUOExe.Text;
 			this.CfgUoClientPathValue = this.txtUltimaClient.Text;
-			this.CfgUoClientWindowValue = this.txtClientWindow.Text;
+			this.CfgMulPathValue = this.txtMulPath.Text;
+			if (this.cmbClientProcess.SelectedItem is ClientProcessItem selItem && selItem.Pid > 0)
+			{
+				this.CfgUoClientWindowValue = selItem.Pid.ToString();
+			}
 			this.CfgZoomLevelValue = (short)this.trkZoom.Value;
 			this.CfgRunUoCmdPrefix = this.txtCmdPrefix.Text;
 			this.CfgSpawnNameValue = this.txtSpawnName.Text;
@@ -412,6 +582,7 @@ namespace SpawnEditor2
 			}
 			this._HKCUKey.SetValue(this.AppRunUoPathValue, this.CfgRunUoPathValue);
 			this._HKCUKey.SetValue(this.AppUoClientPathValue, this.CfgUoClientPathValue);
+			this._HKCUKey.SetValue(this.AppMulPathValue, this.CfgMulPathValue);
 			this._HKCUKey.SetValue(this.AppUoClientWindowValue, this.CfgUoClientWindowValue);
 			this._HKCUKey.SetValue(this.AppZoomLevelValue, this.CfgZoomLevelValue.ToString());
 			this._HKCUKey.SetValue(this.AppRunUoCmdPrefixValue, this.CfgRunUoCmdPrefix);
@@ -553,6 +724,8 @@ namespace SpawnEditor2
 		// Token: 0x04000046 RID: 70
 		private readonly string AppTransferServerPortValue = "Transfer Server Port";
 
+		private readonly string AppMulPathValue = "MUL Files Path";
+
 		// Token: 0x04000047 RID: 71
 		public string CfgUoClientWindowValue = "Ultima Online Third Dawn";
 
@@ -634,7 +807,36 @@ namespace SpawnEditor2
 		// Token: 0x04000061 RID: 97
 		public string CfgUoClientPathValue;
 
+		public string CfgMulPathValue = string.Empty;
+
 		// Token: 0x04000086 RID: 134
 		private SpawnEditor _Editor;
+	}
+
+	internal class ClientProcessItem
+	{
+		public int Pid { get; private set; }
+		public string ProcessName { get; private set; }
+		public string WindowTitle { get; private set; }
+
+		public ClientProcessItem(int pid, string processName, string windowTitle)
+		{
+			this.Pid = pid;
+			this.ProcessName = processName;
+			this.WindowTitle = windowTitle ?? "";
+		}
+
+		public override string ToString()
+		{
+			if (this.Pid <= 0)
+			{
+				return this.ProcessName;
+			}
+			if (!string.IsNullOrEmpty(this.WindowTitle))
+			{
+				return string.Format("PID {0} - {1} ({2})", this.Pid, this.ProcessName, this.WindowTitle);
+			}
+			return string.Format("PID {0} - {1}", this.Pid, this.ProcessName);
+		}
 	}
 }

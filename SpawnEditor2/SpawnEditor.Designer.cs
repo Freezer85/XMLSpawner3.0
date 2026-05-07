@@ -18,7 +18,7 @@
 		{
 			this.components = new global::System.ComponentModel.Container();
 			global::System.Resources.ResourceManager resourceManager = new global::System.Resources.ResourceManager(typeof(global::SpawnEditor2.SpawnEditor));
-			this.axUOMap = new global::AxUOMAPLib.AxUOMap();
+			this.axUOMap = new global::SpawnEditor2.UOMapControl();
 			this.ttpSpawnInfo = new global::System.Windows.Forms.ToolTip(this.components);
 			this.btnSaveSpawn = new global::System.Windows.Forms.Button();
 			this.btnLoadSpawn = new global::System.Windows.Forms.Button();
@@ -346,7 +346,7 @@
 			this.importAllSpawnTypes = new global::System.Windows.Forms.OpenFileDialog();
 			this.importMapFile = new global::System.Windows.Forms.OpenFileDialog();
 			this.importMSFFile = new global::System.Windows.Forms.OpenFileDialog();
-			this.axUOMap.BeginInit();
+			((global::System.ComponentModel.ISupportInitialize)(this.axUOMap)).BeginInit();
 			this.trkZoom.BeginInit();
 			this.spnMaxCount.BeginInit();
 			this.spnHomeRange.BeginInit();
@@ -408,16 +408,14 @@
 			this.panel3.SuspendLayout();
 			base.SuspendLayout();
 			this.axUOMap.AllowDrop = true;
-			this.axUOMap.ContainingControl = this;
 			this.axUOMap.Enabled = true;
 			this.axUOMap.Location = new global::System.Drawing.Point(8, 0);
 			this.axUOMap.Name = "axUOMap";
-			this.axUOMap.OcxState = (global::System.Windows.Forms.AxHost.State)resourceManager.GetObject("axUOMap.OcxState");
 			this.axUOMap.Size = new global::System.Drawing.Size(472, 464);
 			this.axUOMap.TabIndex = 1;
-			this.axUOMap.MouseMoveEvent += new global::AxUOMAPLib._DUOMapEvents_MouseMoveEventHandler(this.axUOMap_MouseMoveEvent);
-			this.axUOMap.MouseDownEvent += new global::AxUOMAPLib._DUOMapEvents_MouseDownEventHandler(this.axUOMap_MouseDownEvent);
-			this.axUOMap.MouseUpEvent += new global::AxUOMAPLib._DUOMapEvents_MouseUpEventHandler(this.axUOMap_MouseUpEvent);
+			this.axUOMap.MouseMoveEvent += new global::SpawnEditor2.UOMapMouseEventHandler(this.axUOMap_MouseMoveEvent);
+			this.axUOMap.MouseDownEvent += new global::SpawnEditor2.UOMapMouseEventHandler(this.axUOMap_MouseDownEvent);
+			this.axUOMap.MouseUpEvent += new global::SpawnEditor2.UOMapMouseEventHandler(this.axUOMap_MouseUpEvent);
 			this.ttpSpawnInfo.AutoPopDelay = 5000;
 			this.ttpSpawnInfo.InitialDelay = 500;
 			this.ttpSpawnInfo.ReshowDelay = 100;
@@ -2715,7 +2713,7 @@
 			this.Text = "Spawn Editor 2";
 			base.Closing += new global::System.ComponentModel.CancelEventHandler(this.SpawnEditor_Closing);
 			base.Load += new global::System.EventHandler(this.SpawnEditor_Load);
-			this.axUOMap.EndInit();
+			((global::System.ComponentModel.ISupportInitialize)(this.axUOMap)).EndInit();
 			this.trkZoom.EndInit();
 			this.spnMaxCount.EndInit();
 			this.spnHomeRange.EndInit();
@@ -2779,7 +2777,7 @@
 		}
 
 		// Token: 0x04000124 RID: 292
-		internal global::AxUOMAPLib.AxUOMap axUOMap;
+		internal global::SpawnEditor2.UOMapControl axUOMap;
 
 		// Token: 0x04000125 RID: 293
 		private global::System.Windows.Forms.ToolTip ttpSpawnInfo;
