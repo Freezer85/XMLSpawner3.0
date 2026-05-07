@@ -196,6 +196,24 @@ namespace SpawnEditor2
 			this._Editor.RefreshSpawnPoints();
 		}
 
+		private void btnUseMyLocation_Click(object sender, EventArgs e)
+		{
+			if (!this._Editor.TryApplyCurrentLocationToSpawn(this._Spawn))
+			{
+				MessageBox.Show(this, "Impossibile leggere la posizione corrente dello staff.", "Posizione non disponibile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				return;
+			}
+			this._IsConstructed = false;
+			this.spnX.Value = this._Spawn.Bounds.X;
+			this.spnY.Value = this._Spawn.Bounds.Y;
+			this.spnWidth.Value = this._Spawn.Bounds.Width;
+			this.spnHeight.Value = this._Spawn.Bounds.Height;
+			this.spnCentreX.Value = this._Spawn.CentreX;
+			this.spnCentreY.Value = this._Spawn.CentreY;
+			this.spnCentreZ.Value = this._Spawn.CentreZ;
+			this._IsConstructed = true;
+		}
+
 		// Token: 0x06000017 RID: 23 RVA: 0x00003DED File Offset: 0x00001FED
 		private void spnCentreY_ValueChanged(object sender, EventArgs e)
 		{

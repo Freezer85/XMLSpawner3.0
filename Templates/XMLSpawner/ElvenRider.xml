@@ -1,0 +1,42 @@
+<Spawns>
+  <Points>
+    <Name>ElvenRider</Name>
+    <UniqueId>a661a762-19a9-403a-ac99-63abd38d23c9</UniqueId>
+    <Map>Trammel</Map>
+    <X>1015</X>
+    <Y>456</Y>
+    <Width>10</Width>
+    <Height>10</Height>
+    <CentreX>1020</CentreX>
+    <CentreY>461</CentreY>
+    <CentreZ>0</CentreZ>
+    <Range>5</Range>
+    <MaxCount>5</MaxCount>
+    <MinDelay>4</MinDelay>
+    <MaxDelay>10</MaxDelay>
+    <Team>0</Team>
+    <IsGroup>False</IsGroup>
+    <IsRunning>True</IsRunning>
+    <IsHomeRangeRelative>True</IsHomeRangeRelative>
+    <DelayInSec>True</DelayInSec>
+    <Duration>0</Duration>
+    <DespawnTime>0,166666666666667</DespawnTime>
+    <ProximityRange>-1</ProximityRange>
+    <ProximityTriggerSound>500</ProximityTriggerSound>
+    <TriggerProbability>1</TriggerProbability>
+    <InContainer>False</InContainer>
+    <MinRefractory>100</MinRefractory>
+    <MaxRefractory>100</MaxRefractory>
+    <TODStart>0</TODStart>
+    <TODEnd>0</TODEnd>
+    <TODMode>0</TODMode>
+    <KillReset>5</KillReset>
+    <ExternalTriggering>False</ExternalTriggering>
+    <SequentialSpawning>1</SequentialSpawning>
+    <AllowGhostTriggering>False</AllowGhostTriggering>
+    <SpawnOnTrigger>False</SpawnOnTrigger>
+    <SmartSpawning>False</SmartSpawning>
+    <Amount>1</Amount>
+    <Objects2>ElfBrigand/ADD,1/longsword/passivespeed/0,1/ActiveSpeed/0,1/currentSpeed/0,03:MX=1:SB=1:RT=0:TO=0:KL=2:RK=1:CA=1:DN=0,5:DX=0,5:SP=1:OBJ=nightmare/rider/GETONSPAWN,1,serial/tamable/false:MX=1:SB=1:RT=0:TO=0:KL=2:RK=1:CA=1:DN=0,5:DX=0,5:SP=1:OBJ=ElfBrigand/ADD,1/longsword/name/Secondo Spawn/passivespeed/0,1/ActiveSpeed/0,1/currentSpeed/0,03:MX=1:SB=2:RT=0:TO=0:KL=2:RK=1:CA=1:DN=0,5:DX=0,5:SP=1:OBJ=nightmare/rider/GETONSPAWN,2,serial/tamable/false:MX=1:SB=2:RT=0:TO=0:KL=2:RK=1:CA=1:DN=0,5:DX=0,5:SP=1:OBJ=ForziereLivello3:MX=1:SB=3:RT=0:TO=0:KL=4:RK=0:CA=0:DN=0,1:DX=0,1:SP=1</Objects2>
+  </Points>
+</Spawns>

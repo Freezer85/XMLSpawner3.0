@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Spawns>
+  <Points>
+    <Name>SeaGhostShip_SequentialEvent</Name>
+    <UniqueId>f0d2f8e3-7c1a-4b0d-9a3c-0dca61d34a01</UniqueId>
+    <Map>Trammel</Map>
+    <X>554</X>
+    <Y>554</Y>
+    <Width>2</Width>
+    <Height>2</Height>
+    <CentreX>555</CentreX>
+    <CentreY>555</CentreY>
+    <CentreZ>0</CentreZ>
+    <Range>0</Range>
+    <MaxCount>63</MaxCount>
+    <MinDelay>1</MinDelay>
+    <MaxDelay>1</MaxDelay>
+    <Team>0</Team>
+    <IsGroup>false</IsGroup>
+    <IsRunning>true</IsRunning>
+    <IsHomeRangeRelative>false</IsHomeRangeRelative>
+    <DelayInSec>true</DelayInSec>
+    <Duration>0</Duration>
+    <DespawnTime>0</DespawnTime>
+    <ProximityRange>20</ProximityRange>
+    <ProximityTriggerSound>0</ProximityTriggerSound>
+    <ProximityTriggerMessage>Dal mare giunge un sinistro scricchiolio di legni antichi; tra la schiuma e la nebbia sembra emergere il pennone di una nave maledetta.</ProximityTriggerMessage>
+    <TriggerProbability>1</TriggerProbability>
+    <SpeechTrigger></SpeechTrigger>
+    <SkillTrigger></SkillTrigger>
+    <MinRefractory>86400</MinRefractory>
+    <MaxRefractory>129600</MaxRefractory>
+    <TODStart>0</TODStart>
+    <TODEnd>0</TODEnd>
+    <TODMode>0</TODMode>
+    <KillReset>600</KillReset>
+    <ExternalTriggering>false</ExternalTriggering>
+    <SequentialSpawning>1</SequentialSpawning>
+    <AllowGhostTriggering>false</AllowGhostTriggering>
+    <SpawnOnTrigger>true</SpawnOnTrigger>
+    <SmartSpawning>true</SmartSpawning>
+    <Notes>Single-spawner sequential template using SUB groups. The warning text is handled by ProximityTriggerMessage rather than a SENDMSG entry. SUB 1 spawns the ship and crew 4 seconds after trigger through per-entry delay. The crew entries use the 3-kill requirement to advance, and KillReset has been extended to allow realistic time to finish the fight. SUB 2 handles the sinking phase, chest spawn and repeated Z decrement once per second for 25 ticks. SUB 3 deletes the boat and chest, spawns the wreck phase for 30 seconds, then resets to SUB 1. MaxCount is intentionally set to the total entry count used by the template so the sequential groups are not constrained as a weighted single-spawn definition. The sinking warning message has been removed temporarily to isolate advancement behavior after the crew kills. Replace or refine shard-specific syntax such as deck offsets, NoLoot, AI archer, and any item-specific property names after import.</Notes>
+    <Objects2>ArmedSmallBoat/name/SeaGhostShipBoat:MX=1:SB=1:RT=0:TO=0:KL=3:RK=1:CA=1:DN=4:DX=4:SP=1:OBJ=SkeletalKnight/name/SeaGhostShip_Knight_1/NoLoot/true:MX=1:SB=1:RT=0:TO=0:KL=3:RK=1:CA=1:DN=4:DX=4:SP=1:OBJ=SkeletalMage/name/SeaGhostShip_Mage_1/NoLoot/true:MX=1:SB=1:RT=0:TO=0:KL=3:RK=1:CA=1:DN=4:DX=4:SP=1:OBJ=SkeletalKnight/name/SeaGhostShip_Archer/NoLoot/true/AIType/AI_Archer/EQUIP/longbow/ADD/Arrow,80:MX=1:SB=1:RT=0:TO=0:KL=3:RK=1:CA=1:DN=4:DX=4:SP=1:OBJ=ForziereLivelo3/name/SeaGhostShip_Chest:MX=1:SB=2:RT=25:TO=3:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=SET,SeaGhostShipBoat,ArmedSmallBoat/Z/INC,-1:MX=25:SB=2:RT=25:TO=3:KL=0:RK=0:CA=0:DN=1:DX=1:SP=1:OBJ=SET,SeaGhostShip_Chest,ForziereLivelo3/Z/INC,-1:MX=25:SB=2:RT=25:TO=3:KL=0:RK=0:CA=0:DN=1:DX=1:SP=1:OBJ=SET,SeaGhostShipBoat,ArmedSmallBoat/DELETE:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=SET,SeaGhostShip_Chest,ForziereLivelo3/DELETE:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=BrokenShipWreck/name/SeaGhostShip_Wreck_1:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=BrokenShipWreck/name/SeaGhostShip_Wreck_2:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=BrokenShipWreck/name/SeaGhostShip_Wreck_3:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=BrokenShipWreck/name/SeaGhostShip_Wreck_4:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=BrokenShipWreck/name/SeaGhostShip_Wreck_5:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1:OBJ=ShipWreck/name/SeaGhostShip_CoreWreck:MX=1:SB=3:RT=30:TO=1:KL=0:RK=0:CA=0:DN=-1:DX=-1:SP=1</Objects2>
+  </Points>
+</Spawns>

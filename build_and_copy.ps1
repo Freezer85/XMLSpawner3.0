@@ -35,10 +35,22 @@ if ($rc -ne 0) {
     Write-Host "Build failed with exit code $rc"
     exit $rc
 }
+
+$distClientDir = Join-Path $root "dist\Client"
+$distServerDllDir = Join-Path $root "dist\Server\DLL"
+
+if (Test-Path $distClientDir) {
+    Get-ChildItem -Path $distClientDir -Filter *.pdb -File | Remove-Item -Force
+}
+
+if (Test-Path $distServerDllDir) {
+    Get-ChildItem -Path $distServerDllDir -Filter *.pdb -File | Remove-Item -Force
+}
+
 Write-Host "Build succeeded. Listing dist\Client contents:"
-Get-ChildItem -Path "$root\dist\Client" | Select-Object Name, LastWriteTime, Length | Format-List
-if (Test-Path "$root\dist\Server\DLL") {
+Get-ChildItem -Path $distClientDir | Select-Object Name, LastWriteTime, Length | Format-List
+if (Test-Path $distServerDllDir) {
     Write-Host "Build succeeded. Listing dist\Server\DLL contents:"
-    Get-ChildItem -Path "$root\dist\Server\DLL" | Select-Object Name, LastWriteTime, Length | Format-List
+    Get-ChildItem -Path $distServerDllDir | Select-Object Name, LastWriteTime, Length | Format-List
 }
 exit 0

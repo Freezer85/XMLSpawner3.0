@@ -61,9 +61,11 @@ namespace SpawnEditor2
 		{
 			SetStyle(
 				ControlStyles.AllPaintingInWmPaint |
+				ControlStyles.Selectable |
 				ControlStyles.UserPaint |
 				ControlStyles.OptimizedDoubleBuffer |
 				ControlStyles.ResizeRedraw, true);
+			TabStop = true;
 			BackColor = Color.Black;
 		}
 
@@ -632,6 +634,7 @@ namespace SpawnEditor2
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
+			Focus();
 			int button = 0;
 			if (e.Button == MouseButtons.Left) button = 1;
 			else if (e.Button == MouseButtons.Right) button = 2;
@@ -660,6 +663,12 @@ namespace SpawnEditor2
 
 			if (MouseMoveEvent != null)
 				MouseMoveEvent(this, new UOMapMouseEventArgs { x = e.X, y = e.Y, button = button });
+		}
+
+		protected override void OnMouseEnter(EventArgs e)
+		{
+			base.OnMouseEnter(e);
+			Focus();
 		}
 
 		#endregion

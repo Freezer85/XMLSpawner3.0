@@ -40,8 +40,10 @@ namespace SpawnEditor2
 			SpawnEditor.Debug("Starting");
 			this.InitializeMapCenters();
 			this.InitializeComponent();
+			this.axUOMap.MouseWheel += new MouseEventHandler(this.axUOMap_MouseWheel);
 			SpawnEditor.Debug("Initialized");
-			this.SmallWindow();
+			this.chkDetails.Checked = true;
+			this.LargeWindow();
 			SpawnEditor.Debug("WindowConfigured");
 			this._CfgDialog = new Configure(this);
 			SpawnEditor.Debug("ConfigurationDialog");
@@ -386,9 +388,11 @@ namespace SpawnEditor2
 			this.spnKillReset.Value = 1m;
 			this.spnProximitySnd.Value = 500m;
 			this.chkAllowGhost.Checked = false;
+			this.chkAllowNPC.Checked = false;
 			this.chkSpawnOnTrigger.Checked = false;
 			this.chkSequentialSpawn.Checked = false;
 			this.chkSmartSpawning.Checked = false;
+			this.chkTickReset.Checked = false;
 			this.chkInContainer.Checked = false;
 			this.chkRealTOD.Checked = true;
 			this.chkGameTOD.Checked = false;
@@ -580,9 +584,11 @@ namespace SpawnEditor2
 			Spawn.SpawnKillReset = (int)this.spnKillReset.Value;
 			Spawn.SpawnProximitySnd = (int)this.spnProximitySnd.Value;
 			Spawn.SpawnAllowGhost = this.chkAllowGhost.Checked;
+			Spawn.SpawnAllowNPC = this.chkAllowNPC.Checked;
 			Spawn.SpawnSpawnOnTrigger = this.chkSpawnOnTrigger.Checked;
 			Spawn.SpawnSequentialSpawn = ((!this.chkSequentialSpawn.Checked) ? (-1) : 0);
 			Spawn.SpawnSmartSpawning = this.chkSmartSpawning.Checked;
+			Spawn.SpawnTickReset = this.chkTickReset.Checked;
 			Spawn.SpawnTODMode = ((!this.chkRealTOD.Checked) ? 1 : 0);
 			Spawn.SpawnInContainer = this.chkInContainer.Checked;
 			Spawn.SpawnSkillTrigger = this.TrimmedString(this.textSkillTrigger.Text);
@@ -1850,9 +1856,11 @@ namespace SpawnEditor2
 			this.spnKillReset.Value = Spawn.SpawnKillReset;
 			this.spnProximitySnd.Value = Spawn.SpawnProximitySnd;
 			this.chkAllowGhost.Checked = Spawn.SpawnAllowGhost;
+			this.chkAllowNPC.Checked = Spawn.SpawnAllowNPC;
 			this.chkSpawnOnTrigger.Checked = Spawn.SpawnSpawnOnTrigger;
 			this.chkSequentialSpawn.Checked = Spawn.SpawnSequentialSpawn > -1;
 			this.chkSmartSpawning.Checked = Spawn.SpawnSmartSpawning;
+			this.chkTickReset.Checked = Spawn.SpawnTickReset;
 			if (Spawn.SpawnTODMode == 0)
 			{
 				this.chkRealTOD.Checked = true;
@@ -1933,6 +1941,32 @@ namespace SpawnEditor2
 			this.RefreshSpawnPoints();
 		}
 
+		private void axUOMap_MouseWheel(object sender, MouseEventArgs e)
+		{
+			int wheelSteps = e.Delta / SystemInformation.MouseWheelScrollDelta;
+			if (wheelSteps == 0)
+			{
+				wheelSteps = ((e.Delta > 0) ? 1 : -1);
+			}
+
+			int newZoom = this.trkZoom.Value + wheelSteps;
+			if (newZoom < this.trkZoom.Minimum)
+			{
+				newZoom = this.trkZoom.Minimum;
+			}
+			else if (newZoom > this.trkZoom.Maximum)
+			{
+				newZoom = this.trkZoom.Maximum;
+			}
+
+			if (newZoom != this.trkZoom.Value)
+			{
+				this.trkZoom.Value = newZoom;
+			}
+
+			this.axUOMap.Focus();
+		}
+
 		// Token: 0x060000B0 RID: 176 RVA: 0x00018C58 File Offset: 0x00016E58
 		private void axUOMap_MouseUpEvent(object sender, UOMapMouseEventArgs e)
 		{
@@ -1997,7 +2031,7 @@ namespace SpawnEditor2
 				this.AssignCenter(num, num2, (short)this.cbxMap.SelectedIndex);
 				this.RefreshSpawnPoints();
 			}
-			this.trkZoom.Focus();
+			this.axUOMap.Focus();
 		}
 
 		// Token: 0x060000B1 RID: 177 RVA: 0x00018FD4 File Offset: 0x000171D4
@@ -2009,7 +2043,7 @@ namespace SpawnEditor2
 			WorldMap worldMap = (WorldMap)this.cbxMap.SelectedItem;
 			if (e.button == 0)
 			{
-				this.trkZoom.Focus();
+				this.axUOMap.Focus();
 				this.MouseResize = false;
 				string caption = string.Empty;
 				bool flag = false;
@@ -2877,9 +2911,11 @@ namespace SpawnEditor2
 				dataSet.Tables["Points"].Columns.Add("SequentialSpawning");
 				dataSet.Tables["Points"].Columns.Add("RegionName");
 				dataSet.Tables["Points"].Columns.Add("AllowGhostTriggering");
+				dataSet.Tables["Points"].Columns.Add("AllowNPCTriggering");
 				dataSet.Tables["Points"].Columns.Add("SpawnOnTrigger");
 				dataSet.Tables["Points"].Columns.Add("ConfigFile");
 				dataSet.Tables["Points"].Columns.Add("SmartSpawning");
+				dataSet.Tables["Points"].Columns.Add("TickReset");
 				dataSet.Tables["Points"].Columns.Add("WayPoint");
 				dataSet.Tables["Points"].Columns.Add("Amount");
 				dataSet.Tables["Points"].Columns.Add("Notes");
@@ -2957,9 +2993,11 @@ namespace SpawnEditor2
 							row["SequentialSpawning"] = spawn.SpawnSequentialSpawn;
 							row["RegionName"] = spawn.SpawnRegionName;
 							row["AllowGhostTriggering"] = spawn.SpawnAllowGhost;
+							row["AllowNPCTriggering"] = spawn.SpawnAllowNPC;
 							row["SpawnOnTrigger"] = spawn.SpawnSpawnOnTrigger;
 							row["ConfigFile"] = spawn.SpawnConfigFile;
 							row["SmartSpawning"] = spawn.SpawnSmartSpawning;
+							row["TickReset"] = spawn.SpawnTickReset;
 							row["WayPoint"] = spawn.SpawnWaypoint;
 							row["Amount"] = spawn.SpawnStackAmount;
 							if (spawn.SpawnNotes != null && spawn.SpawnNotes.Trim().Length > 0)
@@ -3691,6 +3729,33 @@ namespace SpawnEditor2
 			SpawnEditor.Debug("=== UpdateMyLocation() COMPLETED (server-only) ===");
 		}
 
+		internal bool TryApplyCurrentLocationToSpawn(SpawnPoint spawn)
+		{
+			if (spawn == null)
+			{
+				return false;
+			}
+			this.UpdateMyLocation();
+			if (this.MyLocation == null || this.MyLocation.Facet < 0 || this.MyLocation.Facet >= Enum.GetValues(typeof(WorldMap)).Length - 1)
+			{
+				return false;
+			}
+			spawn.Map = (WorldMap)this.MyLocation.Facet;
+			spawn.CentreX = (short)this.MyLocation.X;
+			spawn.CentreY = (short)this.MyLocation.Y;
+			spawn.CentreZ = (short)this.MyLocation.Z;
+			if (!this.SpawnLocationLocked)
+			{
+				int width = spawn.Bounds.Width;
+				int height = spawn.Bounds.Height;
+				spawn.Bounds = new Rectangle(this.MyLocation.X - width / 2, this.MyLocation.Y - height / 2, width, height);
+			}
+			this.cbxMap.SelectedIndex = this.MyLocation.Facet;
+			this.AssignCenter((short)this.MyLocation.X, (short)this.MyLocation.Y, (short)this.MyLocation.Facet);
+			this.RefreshSpawnPoints();
+			return true;
+		}
+
 		internal bool TryGetLocationFromMemory(ref int x, ref int y, ref int z, ref int facet)
 		{
 			try
@@ -4134,6 +4199,15 @@ namespace SpawnEditor2
 		[DllImport("User32.dll", EntryPoint = "SendMessageA")]
 		public static extern int SendMessage(int _WindowHandler, int _WM_USER, int _data, int _id);
 
+		[DllImport("user32.dll", EntryPoint = "PostMessageA")]
+		private static extern bool PostMessage(int hWnd, int msg, int wParam, int lParam);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
 		// Token: 0x060000E5 RID: 229
 		[DllImport("User32.dll", EntryPoint = "FindWindowA")]
 		public static extern int FindWindow(string _ClassName, string _WindowName);
@@ -4145,16 +4219,111 @@ namespace SpawnEditor2
 		[DllImport("User32.dll")]
 		private static extern IntPtr GetForegroundWindow();
 
+		private const int WM_KEYDOWN = 256;
+
+		private const int WM_KEYUP = 257;
+
+		private const int WM_CHAR = 258;
+
+		private const int VK_RETURN = 13;
+
+		private const int KEYEVENTF_KEYUP = 2;
+
+		private const int INPUT_KEYBOARD = 1;
+
+		private const int KEYEVENTF_SCANCODE = 8;
+
+		private const short SCAN_RETURN = 28;
+
+		[StructLayout(LayoutKind.Sequential)]
+		private struct INPUT
+		{
+			public int type;
+			public InputUnion U;
+		}
+
+		[StructLayout(LayoutKind.Explicit)]
+		private struct InputUnion
+		{
+			[FieldOffset(0)]
+			public KEYBDINPUT ki;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private struct KEYBDINPUT
+		{
+			public short wVk;
+			public short wScan;
+			public int dwFlags;
+			public int time;
+			public IntPtr dwExtraInfo;
+		}
+
+		private void SendEnterToWindow(int windowHandle)
+		{
+			PostMessage(windowHandle, WM_KEYDOWN, VK_RETURN, 0);
+			PostMessage(windowHandle, WM_CHAR, VK_RETURN, 0);
+			PostMessage(windowHandle, WM_KEYUP, VK_RETURN, 0);
+		}
+
+		private void SendConfirmedEnter(int windowHandle, int delayBeforeSend)
+		{
+			System.Threading.Thread.Sleep(delayBeforeSend);
+			this.SendEnterToWindow(windowHandle);
+			System.Threading.Thread.Sleep(120);
+			SendKeys.SendWait("{ENTER}");
+		}
+
+		private void SendPhysicalEnter(int delayBeforeSend)
+		{
+			System.Threading.Thread.Sleep(delayBeforeSend);
+			INPUT[] inputs = new INPUT[]
+			{
+				new INPUT
+				{
+					type = INPUT_KEYBOARD,
+					U = new InputUnion
+					{
+						ki = new KEYBDINPUT
+						{
+							wVk = 0,
+							wScan = SCAN_RETURN,
+							dwFlags = KEYEVENTF_SCANCODE,
+							time = 0,
+							dwExtraInfo = IntPtr.Zero
+						}
+					}
+				},
+				new INPUT
+				{
+					type = INPUT_KEYBOARD,
+					U = new InputUnion
+					{
+						ki = new KEYBDINPUT
+						{
+							wVk = 0,
+							wScan = SCAN_RETURN,
+							dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+							time = 0,
+							dwExtraInfo = IntPtr.Zero
+						}
+					}
+				}
+			};
+
+			SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+		}
+
 		private void SendStringToWindow(int windowHandle, string text)
 		{
 			IntPtr previousForeground = GetForegroundWindow();
 
 			SetForegroundWindow(windowHandle);
-			System.Threading.Thread.Sleep(200);
+			System.Threading.Thread.Sleep(250);
 
 			// Send Enter to open chat line
-			SendKeys.SendWait("{ENTER}");
-			System.Threading.Thread.Sleep(150);
+			this.SendConfirmedEnter(windowHandle, 0);
+			System.Threading.Thread.Sleep(220);
 
 			// Send each character individually to avoid SendKeys special char issues
 			foreach (char c in text)
@@ -4172,9 +4341,8 @@ namespace SpawnEditor2
 			}
 
 			// Send Enter to execute command
-			System.Threading.Thread.Sleep(100);
-			SendKeys.SendWait("{ENTER}");
-			System.Threading.Thread.Sleep(100);
+			this.SendPhysicalEnter(260);
+			System.Threading.Thread.Sleep(180);
 
 			// Restore previous window focus
 			if (previousForeground != IntPtr.Zero)
@@ -4454,14 +4622,15 @@ namespace SpawnEditor2
 		private void LargeWindow()
 		{
 			this.MinimumSize = new Size(660, 520);
-			this.MaximumSize = new Size(1035, 780);
-			base.Size = new Size(1035, 780);
+			this.MaximumSize = Size.Empty;
 			this.panel1.Visible = true;
 			this.tabControl1.Visible = true;
 			this.panel3.Visible = true;
-			this.axUOMap.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-			this.axUOMap.Size = new Size(472, 464);
-			this.tabControl2.Size = new Size(176, 500);
+			this.axUOMap.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+			if (base.Width < 1220 || base.Height < 780)
+			{
+				base.Size = new Size(Math.Max(base.Width, 1220), Math.Max(base.Height, 780));
+			}
 		}
 
 		// Token: 0x060000F4 RID: 244 RVA: 0x0001DF54 File Offset: 0x0001C154
@@ -6552,6 +6721,14 @@ namespace SpawnEditor2
 			if (this.ControlHasBeenSelected(this.chkSequentialSpawn.Name))
 			{
 				spawn.SequentialSpawn = this.chkSequentialSpawn.Checked;
+			}
+			if (this.ControlHasBeenSelected(this.chkAllowNPC.Name))
+			{
+				spawn.AllowNPC = this.chkAllowNPC.Checked;
+			}
+			if (this.ControlHasBeenSelected(this.chkTickReset.Name))
+			{
+				spawn.TickReset = this.chkTickReset.Checked;
 			}
 			if (!this.ControlHasBeenSelected(this.chkSmartSpawning.Name))
 			{

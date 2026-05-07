@@ -19,6 +19,5 @@
   <Target Name="CopyToDist" AfterTargets="Build">
     <MakeDir Directories="$(DistServerDllDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DistServerDllDir)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(DistServerDllDir)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
   </Target>
 </Project>

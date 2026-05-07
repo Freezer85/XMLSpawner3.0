@@ -42,8 +42,10 @@ namespace SpawnEditor2
 				spawn.SpawnTODStart = this.SpawnTODStart;
 				spawn.SpawnTODEnd = this.SpawnTODEnd;
 				spawn.SpawnAllowGhost = this.SpawnAllowGhost;
+				spawn.SpawnAllowNPC = this.SpawnAllowNPC;
 				spawn.SpawnSpawnOnTrigger = this.SpawnSpawnOnTrigger;
 				spawn.SpawnSmartSpawning = this.SpawnSmartSpawning;
+				spawn.SpawnTickReset = this.SpawnTickReset;
 				spawn.SpawnTODMode = this.SpawnTODMode;
 				spawn.SpawnSkillTrigger = this.SpawnSkillTrigger;
 				spawn.SpawnSpeechTrigger = this.SpawnSpeechTrigger;
@@ -404,6 +406,30 @@ namespace SpawnEditor2
 			set
 			{
 				this.SpawnAllowGhost = value;
+			}
+		}
+
+		public bool AllowNPC
+		{
+			get
+			{
+				return this.SpawnAllowNPC;
+			}
+			set
+			{
+				this.SpawnAllowNPC = value;
+			}
+		}
+
+		public bool TickReset
+		{
+			get
+			{
+				return this.SpawnTickReset;
+			}
+			set
+			{
+				this.SpawnTickReset = value;
 			}
 		}
 
@@ -1038,6 +1064,14 @@ namespace SpawnEditor2
 			}
 			try
 			{
+				this.SpawnAllowNPC = bool.Parse(SpawnPoint.GetText(node["AllowNPCTriggering"], "false"));
+			}
+			catch
+			{
+				num++;
+			}
+			try
+			{
 				this.SpawnSpawnOnTrigger = bool.Parse(SpawnPoint.GetText(node["SpawnOnTrigger"], "false"));
 			}
 			catch
@@ -1055,6 +1089,14 @@ namespace SpawnEditor2
 			try
 			{
 				this.SpawnSmartSpawning = bool.Parse(SpawnPoint.GetText(node["SmartSpawning"], "false"));
+			}
+			catch
+			{
+				num++;
+			}
+			try
+			{
+				this.SpawnTickReset = bool.Parse(SpawnPoint.GetText(node["TickReset"], "false"));
 			}
 			catch
 			{
@@ -1438,6 +1480,14 @@ namespace SpawnEditor2
 			}
 			try
 			{
+				this.SpawnAllowNPC = bool.Parse((string)SpawnRow["AllowNPCTriggering"]);
+			}
+			catch
+			{
+				num++;
+			}
+			try
+			{
 				this.SpawnSpawnOnTrigger = bool.Parse((string)SpawnRow["SpawnOnTrigger"]);
 			}
 			catch
@@ -1455,6 +1505,14 @@ namespace SpawnEditor2
 			try
 			{
 				this.SpawnSmartSpawning = bool.Parse((string)SpawnRow["SmartSpawning"]);
+			}
+			catch
+			{
+				num++;
+			}
+			try
+			{
+				this.SpawnTickReset = bool.Parse((string)SpawnRow["TickReset"]);
 			}
 			catch
 			{
@@ -2111,12 +2169,18 @@ namespace SpawnEditor2
 		public bool SpawnAllowGhost;
 
 		// Token: 0x0400029D RID: 669
-		public bool SpawnSpawnOnTrigger;
+		public bool SpawnAllowNPC;
 
 		// Token: 0x0400029E RID: 670
-		public bool SpawnSmartSpawning;
+		public bool SpawnSpawnOnTrigger;
 
 		// Token: 0x0400029F RID: 671
+		public bool SpawnSmartSpawning;
+
+		// Token: 0x040002A0 RID: 672
+		public bool SpawnTickReset;
+
+		// Token: 0x040002A1 RID: 673
 		public int SpawnTODMode;
 
 		// Token: 0x040002A0 RID: 672

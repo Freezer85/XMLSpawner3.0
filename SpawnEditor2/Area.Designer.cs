@@ -33,6 +33,7 @@
 			this.label3 = new global::System.Windows.Forms.Label();
 			this.label4 = new global::System.Windows.Forms.Label();
 			this.label5 = new global::System.Windows.Forms.Label();
+			this.btnUseMyLocation = new global::System.Windows.Forms.Button();
 			this.spnX.BeginInit();
 			this.spnY.BeginInit();
 			this.spnWidth.BeginInit();
@@ -188,13 +189,21 @@
 			this.label5.TabIndex = 16;
 			this.label5.Text = "Spawner Bounds";
 			this.label5.TextAlign = global::System.Drawing.ContentAlignment.TopCenter;
+			this.btnUseMyLocation.Location = new global::System.Drawing.Point(8, 272);
+			this.btnUseMyLocation.Name = "btnUseMyLocation";
+			this.btnUseMyLocation.Size = new global::System.Drawing.Size(144, 23);
+			this.btnUseMyLocation.TabIndex = 17;
+			this.btnUseMyLocation.Text = "Usa posizione staff";
+			this.btnUseMyLocation.UseVisualStyleBackColor = true;
+			this.btnUseMyLocation.Click += new global::System.EventHandler(this.btnUseMyLocation_Click);
 			this.AutoScaleBaseSize = new global::System.Drawing.Size(5, 13);
 			base.CancelButton = this.btnCancel;
-			base.ClientSize = new global::System.Drawing.Size(160, 280);
+			base.ClientSize = new global::System.Drawing.Size(160, 304);
 			base.Controls.Add(this.label5);
 			base.Controls.Add(this.label4);
 			base.Controls.Add(this.label3);
 			base.Controls.Add(this.label2);
+			base.Controls.Add(this.btnUseMyLocation);
 			base.Controls.Add(this.spnCentreX);
 			base.Controls.Add(this.spnCentreY);
 			base.Controls.Add(this.label1);
@@ -257,6 +266,9 @@
 		private global::System.Windows.Forms.Button btnCancel;
 
 		// Token: 0x04000020 RID: 32
+		private global::System.Windows.Forms.Button btnUseMyLocation;
+
+		// Token: 0x04000021 RID: 33
 		private global::System.Windows.Forms.Label label1;
 
 		// Token: 0x04000021 RID: 33
