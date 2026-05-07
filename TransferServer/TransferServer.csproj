@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>TransferServer</AssemblyName>
+    <RootNamespace>Server.Engines.XmlSpawner2</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>latest</LangVersion>
+    <DistServerDllDir>$(MSBuildProjectDirectory)\..\dist\Server\DLL\</DistServerDllDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SpawnEditor2\Server\Engines\XmlSpawner2\ErrorMessage.cs" Link="Server\Engines\XmlSpawner2\ErrorMessage.cs" />
+    <Compile Include="..\SpawnEditor2\Server\Engines\XmlSpawner2\RemoteMessaging.cs" Link="Server\Engines\XmlSpawner2\RemoteMessaging.cs" />
+    <Compile Include="..\SpawnEditor2\Server\Engines\XmlSpawner2\TransferMessage.cs" Link="Server\Engines\XmlSpawner2\TransferMessage.cs" />
+    <Compile Include="..\SpawnEditor2\Server\Engines\XmlSpawner2\ZLib.cs" Link="Server\Engines\XmlSpawner2\ZLib.cs" />
+  </ItemGroup>
+
+  <Target Name="CopyToDist" AfterTargets="Build">
+    <MakeDir Directories="$(DistServerDllDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DistServerDllDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(DistServerDllDir)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+  </Target>
+</Project>
