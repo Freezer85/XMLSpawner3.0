@@ -1886,7 +1886,7 @@
 			this.chkRK8.Name = "chkRK8";
 			this.chkRK8.Size = new global::System.Drawing.Size(16, 16);
 			this.chkRK8.TabIndex = 99;
-			this.chkRK8.Text = "checkBox15";
+			this.chkRK8.Text = "";
 			this.entryMax8.Location = new global::System.Drawing.Point(216, 200);
 			global::System.Windows.Forms.NumericUpDown numericUpDown37 = this.entryMax8;
 			int[] bits37 = new int[4];
@@ -1944,7 +1944,7 @@
 			this.chkRK7.Name = "chkRK7";
 			this.chkRK7.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK7.TabIndex = 88;
-			this.chkRK7.Text = "checkBox13";
+			this.chkRK7.Text = "";
 			this.entryMax7.Location = new global::System.Drawing.Point(216, 176);
 			global::System.Windows.Forms.NumericUpDown numericUpDown38 = this.entryMax7;
 			int[] bits38 = new int[4];
@@ -1991,7 +1991,7 @@
 			this.chkRK6.Name = "chkRK6";
 			this.chkRK6.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK6.TabIndex = 77;
-			this.chkRK6.Text = "checkBox11";
+			this.chkRK6.Text = "";
 			this.entryMax6.Location = new global::System.Drawing.Point(216, 152);
 			global::System.Windows.Forms.NumericUpDown numericUpDown39 = this.entryMax6;
 			int[] bits39 = new int[4];
@@ -2038,7 +2038,7 @@
 			this.chkRK5.Name = "chkRK5";
 			this.chkRK5.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK5.TabIndex = 66;
-			this.chkRK5.Text = "checkBox9";
+			this.chkRK5.Text = "";
 			this.entryMax5.Location = new global::System.Drawing.Point(216, 128);
 			global::System.Windows.Forms.NumericUpDown numericUpDown40 = this.entryMax5;
 			int[] bits40 = new int[4];
@@ -2085,7 +2085,7 @@
 			this.chkRK4.Name = "chkRK4";
 			this.chkRK4.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK4.TabIndex = 55;
-			this.chkRK4.Text = "checkBox7";
+			this.chkRK4.Text = "";
 			this.entryMax4.Location = new global::System.Drawing.Point(216, 104);
 			global::System.Windows.Forms.NumericUpDown numericUpDown41 = this.entryMax4;
 			int[] bits41 = new int[4];
@@ -2132,7 +2132,7 @@
 			this.chkRK3.Name = "chkRK3";
 			this.chkRK3.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK3.TabIndex = 44;
-			this.chkRK3.Text = "checkBox5";
+			this.chkRK3.Text = "";
 			this.entryMax3.Location = new global::System.Drawing.Point(216, 80);
 			global::System.Windows.Forms.NumericUpDown numericUpDown42 = this.entryMax3;
 			int[] bits42 = new int[4];
@@ -2179,7 +2179,7 @@
 			this.chkRK2.Name = "chkRK2";
 			this.chkRK2.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK2.TabIndex = 30;
-			this.chkRK2.Text = "checkBox3";
+			this.chkRK2.Text = "";
 			this.entryMax2.Location = new global::System.Drawing.Point(216, 56);
 			global::System.Windows.Forms.NumericUpDown numericUpDown43 = this.entryMax2;
 			int[] bits43 = new int[4];
@@ -2236,7 +2236,7 @@
 			this.chkRK1.Name = "chkRK1";
 			this.chkRK1.Size = new global::System.Drawing.Size(16, 24);
 			this.chkRK1.TabIndex = 8;
-			this.chkRK1.Text = "checkBox2";
+			this.chkRK1.Text = "";
 			this.entryMax1.Location = new global::System.Drawing.Point(216, 32);
 			global::System.Windows.Forms.NumericUpDown numericUpDown44 = this.entryMax1;
 			int[] bits44 = new int[4];
