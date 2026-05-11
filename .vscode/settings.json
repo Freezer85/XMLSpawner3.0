@@ -1,0 +1,7 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "Out-Null": true,
+        ".\\build_and_copy.ps1": true,
+        "dotnet build": true
+    }
+}
