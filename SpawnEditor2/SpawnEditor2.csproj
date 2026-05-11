@@ -62,6 +62,7 @@
     <Compile Include="LocationNode.cs" />
     <Compile Include="LocationSubNode.cs" />
     <Compile Include="LocationTree.cs" />
+    <Compile Include="LocalSetupStorage.cs" />
     <Compile Include="MapLocation.cs" />
     <Compile Include="MusicName.cs" />
     <Compile Include="ParentNode.cs" />
@@ -144,27 +145,6 @@
       <_FilesToCopy Include="$(TargetDir)$(AssemblyName).exe.config" Condition="Exists('$(TargetDir)$(AssemblyName).exe.config')" />
       <_FilesToCopy Include="$(MSBuildProjectDirectory)\..\README.md" Condition="Exists('$(MSBuildProjectDirectory)\..\README.md')" />
     </ItemGroup>
-    <!-- Also copy any built outputs from bin (handles x86/AnyCPU/platform-specific outputs) -->
-    <ItemGroup>
-      <_BinFiles Include="$(MSBuildProjectDirectory)\bin\**\$(AssemblyName).exe" />
-      <_BinFiles Include="$(MSBuildProjectDirectory)\bin\**\$(AssemblyName).exe.config" Condition="Exists('%(Identity)')" />
-    </ItemGroup>
-    <ItemGroup>
-      <_FilesToCopy Include="@(_BinFiles)" />
-    </ItemGroup>
     <Copy SourceFiles="@(_FilesToCopy)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" />
-  </Target>
-
-  <!-- Legacy behavior: also copy outputs from bin\x86\$(Configuration)\net48 if present -->
-  <Target Name="CopyBinX86ToDist" AfterTargets="Build">
-    <PropertyGroup>
-      <_BinX86Dir>$(MSBuildProjectDirectory)\bin\x86\$(Configuration)\net48\</_BinX86Dir>
-    </PropertyGroup>
-    <ItemGroup>
-      <_X86Exe Include="$(_BinX86Dir)$(AssemblyName).exe" Condition="Exists('$(_BinX86Dir)$(AssemblyName).exe')" />
-      <_X86Config Include="$(_BinX86Dir)$(AssemblyName).exe.config" Condition="Exists('$(_BinX86Dir)$(AssemblyName).exe.config')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_X86Exe)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" Condition="@(_X86Exe) != ''" />
-    <Copy SourceFiles="@(_X86Config)" DestinationFolder="$(DistClientDir)" SkipUnchangedFiles="true" Condition="@(_X86Config) != ''" />
   </Target>
 </Project>

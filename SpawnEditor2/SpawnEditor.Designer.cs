@@ -156,6 +156,7 @@
 			this.sfdSaveFile = new global::System.Windows.Forms.SaveFileDialog();
 			this.stbMain = new global::System.Windows.Forms.StatusBar();
 			this.grpSpawnEntries = new global::System.Windows.Forms.GroupBox();
+			this.splitPanel3 = new global::System.Windows.Forms.SplitContainer();
 			this.entryPer8 = new global::System.Windows.Forms.NumericUpDown();
 			this.entryPer7 = new global::System.Windows.Forms.NumericUpDown();
 			this.entryPer6 = new global::System.Windows.Forms.NumericUpDown();
@@ -414,13 +415,17 @@
 			this.splitContainerRightDetails.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.panel3.SuspendLayout();
+			((global::System.ComponentModel.ISupportInitialize)(this.splitPanel3)).BeginInit();
+			this.splitPanel3.Panel1.SuspendLayout();
+			this.splitPanel3.Panel2.SuspendLayout();
+			this.splitPanel3.SuspendLayout();
 			base.SuspendLayout();
 			this.axUOMap.AllowDrop = true;
 			this.axUOMap.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Bottom | global::System.Windows.Forms.AnchorStyles.Left;
 			this.axUOMap.Enabled = true;
-			this.axUOMap.Location = new global::System.Drawing.Point(8, 0);
+			this.axUOMap.Location = new global::System.Drawing.Point(0, 0);
 			this.axUOMap.Name = "axUOMap";
-			this.axUOMap.Size = new global::System.Drawing.Size(620, 876);
+			this.axUOMap.Size = new global::System.Drawing.Size(300, 764);
 			this.axUOMap.TabIndex = 1;
 			this.axUOMap.MouseMoveEvent += new global::SpawnEditor2.UOMapMouseEventHandler(this.axUOMap_MouseMoveEvent);
 			this.axUOMap.MouseDownEvent += new global::SpawnEditor2.UOMapMouseEventHandler(this.axUOMap_MouseDownEvent);
@@ -1151,17 +1156,17 @@
 			this.cbxShade.TabIndex = 17;
 			this.ttpSpawnInfo.SetToolTip(this.cbxShade, "Changes the current map.");
 			this.cbxShade.SelectedIndexChanged += new global::System.EventHandler(this.cbxShade_SelectedIndexChanged);
-			this.label9.Location = new global::System.Drawing.Point(592, 16);
+			this.label9.Location = new global::System.Drawing.Point(602, 16);
 			this.label9.Name = "label9";
 			this.label9.Size = new global::System.Drawing.Size(24, 16);
 			this.label9.TabIndex = 23;
 			this.label9.Text = "Clr";
 			this.ttpSpawnInfo.SetToolTip(this.label9, "ClearOnAdvance flag. When checked all entries in that subgroup will be cleared on sequential spawn advancement.");
-			this.label8.Location = new global::System.Drawing.Point(568, 16);
+			this.label8.Location = new global::System.Drawing.Point(566, 16);
 			this.label8.Name = "label8";
-			this.label8.Size = new global::System.Drawing.Size(24, 16);
+			this.label8.Size = new global::System.Drawing.Size(34, 16);
 			this.label8.TabIndex = 22;
-			this.label8.Text = "RK";
+			this.label8.Text = "R/K";
 			this.ttpSpawnInfo.SetToolTip(this.label8, "RestrictKills flag.  When checked kills of that entry will only be counted if they come from the currently active sequential subgroup.");
 			this.label7.Location = new global::System.Drawing.Point(512, 16);
 			this.label7.Name = "label7";
@@ -1435,7 +1440,7 @@
 			this.lblTransferStatus.TabIndex = 238;
 			this.lblTransferStatus.Text = "Status";
 			this.lblTransferStatus.Visible = false;
-			this.groupTemplateList.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Bottom | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
+			this.groupTemplateList.Anchor = global::System.Windows.Forms.AnchorStyles.None;
 			this.groupTemplateList.Controls.Add(this.btnSaveTemplate);
 			this.btnSaveTemplate.Click += new global::System.EventHandler(this.btnSaveTemplate_Click);
 			this.groupTemplateList.Controls.Add(this.btnMergeTemplate);
@@ -1447,13 +1452,15 @@
 			this.groupTemplateList.Enabled = true;
 			this.btnMergeTemplate.Enabled = false;
 			this.groupTemplateList.Location = new global::System.Drawing.Point(8, 0);
+			this.groupTemplateList.MinimumSize = new global::System.Drawing.Size(200, 220);
 			this.groupTemplateList.Name = "groupTemplateList";
-			this.groupTemplateList.Dock = global::System.Windows.Forms.DockStyle.Left;
-			this.groupTemplateList.Size = new global::System.Drawing.Size(304, 308);
+			this.groupTemplateList.Dock = global::System.Windows.Forms.DockStyle.Fill;
+			this.groupTemplateList.Size = new global::System.Drawing.Size(348, 308);
 			this.groupTemplateList.TabIndex = 5;
 			this.groupTemplateList.TabStop = false;
 			this.groupTemplateList.Text = "Spawn Templates";
-			this.btnSaveTemplate.Location = new global::System.Drawing.Point(232, 16);
+			this.btnSaveTemplate.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Right;
+			this.btnSaveTemplate.Location = new global::System.Drawing.Point(284, 16);
 			this.btnSaveTemplate.Name = "btnSaveTemplate";
 			this.btnSaveTemplate.Size = new global::System.Drawing.Size(56, 24);
 			this.btnSaveTemplate.TabIndex = 7;
@@ -1624,9 +1631,10 @@
 			this.grpSpawnEntries.Controls.Add(this.entryText1);
 			this.grpSpawnEntries.Controls.Add(this.chkClr1);
 			this.grpSpawnEntries.Dock = global::System.Windows.Forms.DockStyle.Fill;
-			this.grpSpawnEntries.Location = new global::System.Drawing.Point(304, 0);
+			this.grpSpawnEntries.Location = new global::System.Drawing.Point(348, 0);
+			this.grpSpawnEntries.MinimumSize = new global::System.Drawing.Size(640, 220);
 			this.grpSpawnEntries.Name = "grpSpawnEntries";
-			this.grpSpawnEntries.Size = new global::System.Drawing.Size(216, 308);
+			this.grpSpawnEntries.Size = new global::System.Drawing.Size(172, 308);
 			this.grpSpawnEntries.TabIndex = 3;
 			this.grpSpawnEntries.TabStop = false;
 			this.grpSpawnEntries.Text = "Spawn Entries";
@@ -2211,6 +2219,7 @@
 			this.entryTo1.Text = "";
 			this.vScrollBar1.LargeChange = 9;
 			this.vScrollBar1.Location = new global::System.Drawing.Point(616, 16);
+			this.vScrollBar1.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Bottom | global::System.Windows.Forms.AnchorStyles.Right;
 			this.vScrollBar1.Maximum = 8;
 			this.vScrollBar1.Name = "vScrollBar1";
 			this.vScrollBar1.Size = new global::System.Drawing.Size(16, 200);
@@ -2349,7 +2358,7 @@
 			this.textTrigObjectProp.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textTrigObjectProp.Location = new global::System.Drawing.Point(120, 340);
 			this.textTrigObjectProp.Name = "textTrigObjectProp";
-			this.textTrigObjectProp.Size = new global::System.Drawing.Size(360, 20);
+			this.textTrigObjectProp.Size = new global::System.Drawing.Size(352, 20);
 			this.textTrigObjectProp.TabIndex = 199;
 			this.textTrigObjectProp.Text = "";
 			this.label17.Location = new global::System.Drawing.Point(8, 260);
@@ -2360,7 +2369,7 @@
 			this.textSkillTrigger.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textSkillTrigger.Location = new global::System.Drawing.Point(120, 260);
 			this.textSkillTrigger.Name = "textSkillTrigger";
-			this.textSkillTrigger.Size = new global::System.Drawing.Size(360, 20);
+			this.textSkillTrigger.Size = new global::System.Drawing.Size(352, 20);
 			this.textSkillTrigger.TabIndex = 174;
 			this.textSkillTrigger.Text = "";
 			this.label16.Location = new global::System.Drawing.Point(8, 280);
@@ -2371,7 +2380,7 @@
 			this.textSpeechTrigger.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textSpeechTrigger.Location = new global::System.Drawing.Point(120, 280);
 			this.textSpeechTrigger.Name = "textSpeechTrigger";
-			this.textSpeechTrigger.Size = new global::System.Drawing.Size(360, 20);
+			this.textSpeechTrigger.Size = new global::System.Drawing.Size(352, 20);
 			this.textSpeechTrigger.TabIndex = 171;
 			this.textSpeechTrigger.Text = "";
 			this.label15.Location = new global::System.Drawing.Point(8, 300);
@@ -2382,7 +2391,7 @@
 			this.textProximityMsg.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textProximityMsg.Location = new global::System.Drawing.Point(120, 300);
 			this.textProximityMsg.Name = "textProximityMsg";
-			this.textProximityMsg.Size = new global::System.Drawing.Size(360, 20);
+			this.textProximityMsg.Size = new global::System.Drawing.Size(352, 20);
 			this.textProximityMsg.TabIndex = 168;
 			this.textProximityMsg.Text = "";
 			this.label14.Location = new global::System.Drawing.Point(8, 320);
@@ -2393,7 +2402,7 @@
 			this.textPlayerTrigProp.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textPlayerTrigProp.Location = new global::System.Drawing.Point(120, 320);
 			this.textPlayerTrigProp.Name = "textPlayerTrigProp";
-			this.textPlayerTrigProp.Size = new global::System.Drawing.Size(360, 20);
+			this.textPlayerTrigProp.Size = new global::System.Drawing.Size(352, 20);
 			this.textPlayerTrigProp.TabIndex = 159;
 			this.textPlayerTrigProp.Text = "";
 			this.label12.Location = new global::System.Drawing.Point(8, 380);
@@ -2404,7 +2413,7 @@
 			this.textNoTriggerOnCarried.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textNoTriggerOnCarried.Location = new global::System.Drawing.Point(120, 380);
 			this.textNoTriggerOnCarried.Name = "textNoTriggerOnCarried";
-			this.textNoTriggerOnCarried.Size = new global::System.Drawing.Size(360, 20);
+			this.textNoTriggerOnCarried.Size = new global::System.Drawing.Size(352, 20);
 			this.textNoTriggerOnCarried.TabIndex = 153;
 			this.textNoTriggerOnCarried.Text = "";
 			this.label11.Location = new global::System.Drawing.Point(8, 360);
@@ -2415,7 +2424,7 @@
 			this.textTriggerOnCarried.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
 			this.textTriggerOnCarried.Location = new global::System.Drawing.Point(120, 360);
 			this.textTriggerOnCarried.Name = "textTriggerOnCarried";
-			this.textTriggerOnCarried.Size = new global::System.Drawing.Size(360, 20);
+			this.textTriggerOnCarried.Size = new global::System.Drawing.Size(352, 20);
 			this.textTriggerOnCarried.TabIndex = 150;
 			this.textTriggerOnCarried.Text = "";
 			this.mainMenu1.MenuItems.AddRange(new global::System.Windows.Forms.MenuItem[] { this.menuItem5, this.menuItem22, this.menuItem8, this.menuItem14, this.menuItem16 });
@@ -2497,7 +2506,7 @@
 			this.menuItem4.Index = 1;
 			this.menuItem4.Text = "About";
 			this.menuItem4.Click += new global::System.EventHandler(this.menuItem4_Click);
-			this.panel1.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Bottom | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
+			this.panel1.Dock = global::System.Windows.Forms.DockStyle.Fill;
 			this.panel1.Controls.Add(this.panelRight);
 			this.panel1.Controls.Add(this.axUOMap);
 			this.panel1.Cursor = global::System.Windows.Forms.Cursors.Default;
@@ -2505,11 +2514,11 @@
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new global::System.Drawing.Size(1160, 884);
 			this.panel1.TabIndex = 5;
-			this.panelRight.Anchor = global::System.Windows.Forms.AnchorStyles.Top | global::System.Windows.Forms.AnchorStyles.Bottom | global::System.Windows.Forms.AnchorStyles.Left | global::System.Windows.Forms.AnchorStyles.Right;
+			this.panelRight.Dock = global::System.Windows.Forms.DockStyle.Right;
 			this.panelRight.Controls.Add(this.splitContainerRightDetails);
 			this.panelRight.Location = new global::System.Drawing.Point(640, 0);
 			this.panelRight.Name = "panelRight";
-			this.panelRight.Size = new global::System.Drawing.Size(520, 876);
+			this.panelRight.Size = new global::System.Drawing.Size(900, 876);
 			this.panelRight.TabIndex = 9;
 			this.splitContainerRightDetails.Dock = global::System.Windows.Forms.DockStyle.Fill;
 			this.splitContainerRightDetails.FixedPanel = global::System.Windows.Forms.FixedPanel.None;
@@ -2518,8 +2527,10 @@
 			this.splitContainerRightDetails.Orientation = global::System.Windows.Forms.Orientation.Horizontal;
 			this.splitContainerRightDetails.Panel1.Controls.Add(this.tabControl1);
 			this.splitContainerRightDetails.Panel2.Controls.Add(this.panel3);
-			this.splitContainerRightDetails.Size = new global::System.Drawing.Size(520, 876);
-			this.splitContainerRightDetails.SplitterDistance = 496;
+			this.splitContainerRightDetails.Panel1MinSize = 300;
+			this.splitContainerRightDetails.Panel2MinSize = 240;
+			this.splitContainerRightDetails.Size = new global::System.Drawing.Size(900, 876);
+			this.splitContainerRightDetails.SplitterDistance = 530;
 			this.splitContainerRightDetails.SplitterWidth = 6;
 			this.splitContainerRightDetails.TabIndex = 10;
 			this.tabControl1.Controls.Add(this.tabBasic);
@@ -2533,12 +2544,14 @@
 			this.tabControl1.TabIndex = 8;
 			this.tabControl1.Leave += new global::System.EventHandler(this.tabControl1_Leave);
 			this.tabBasic.Controls.Add(this.grpSpawnEdit);
+			this.tabBasic.AutoScroll = true;
 			this.tabBasic.Location = new global::System.Drawing.Point(4, 22);
 			this.tabBasic.Name = "tabBasic";
 			this.tabBasic.Size = new global::System.Drawing.Size(512, 534);
 			this.tabBasic.TabIndex = 0;
 			this.tabBasic.Text = "Basic";
 			this.tabAdvanced.Controls.Add(this.groupBox1);
+			this.tabAdvanced.AutoScroll = true;
 			this.tabAdvanced.Location = new global::System.Drawing.Point(4, 22);
 			this.tabAdvanced.Name = "tabAdvanced";
 			this.tabAdvanced.Size = new global::System.Drawing.Size(512, 534);
@@ -2736,14 +2749,27 @@
 			this.label39.Name = "label39";
 			this.label39.Size = new global::System.Drawing.Size(160, 16);
 			this.label39.TabIndex = 5;
-			this.panel3.Controls.Add(this.grpSpawnEntries);
-			this.panel3.Controls.Add(this.groupTemplateList);
+			this.panel3.Controls.Add(this.splitPanel3);
 			this.panel3.Dock = global::System.Windows.Forms.DockStyle.Fill;
 			this.panel3.Location = new global::System.Drawing.Point(0, 0);
+			this.panel3.AutoScroll = false;
+			this.panel3.MinimumSize = new global::System.Drawing.Size(0, 220);
 			this.panel3.Name = "panel3";
-			this.panel3.Size = new global::System.Drawing.Size(520, 374);
+			this.panel3.Size = new global::System.Drawing.Size(900, 374);
 			this.panel3.TabIndex = 7;
 			this.panel3.Visible = false;
+			this.splitPanel3.Dock = global::System.Windows.Forms.DockStyle.Fill;
+			this.splitPanel3.Location = new global::System.Drawing.Point(0, 0);
+			this.splitPanel3.Name = "splitPanel3";
+			this.splitPanel3.Orientation = global::System.Windows.Forms.Orientation.Vertical;
+			this.splitPanel3.Panel1.Controls.Add(this.groupTemplateList);
+			this.splitPanel3.Panel2.Controls.Add(this.grpSpawnEntries);
+			this.splitPanel3.Panel1MinSize = 200;
+			this.splitPanel3.Panel2MinSize = 640;
+			this.splitPanel3.Size = new global::System.Drawing.Size(900, 374);
+			this.splitPanel3.SplitterDistance = 250;
+			this.splitPanel3.SplitterWidth = 6;
+			this.splitPanel3.TabIndex = 11;
 			this.mcnSpawnPack.MenuItems.AddRange(new global::System.Windows.Forms.MenuItem[] { this.mniDeleteType, this.mniDeleteAllTypes });
 			this.mcnSpawnPack.Popup += new global::System.EventHandler(this.mcnSpawnPack_Popup);
 			this.mniDeleteType.Index = 0;
@@ -2768,7 +2794,7 @@
 			this.importMSFFile.Filter = ".msf | *.msf";
 			base.AutoScale = false;
 			this.AutoScaleBaseSize = new global::System.Drawing.Size(5, 13);
-			base.ClientSize = new global::System.Drawing.Size(1220, 780);
+			base.ClientSize = new global::System.Drawing.Size(1420, 780);
 			base.Controls.Add(this.panel1);
 			base.Controls.Add(this.pnlControls);
 			base.Controls.Add(this.stbMain);
@@ -2779,6 +2805,7 @@
 			this.Text = "Spawn Editor 2";
 			base.Closing += new global::System.ComponentModel.CancelEventHandler(this.SpawnEditor_Closing);
 			base.Load += new global::System.EventHandler(this.SpawnEditor_Load);
+			base.Resize += new global::System.EventHandler(this.SpawnEditor_Resize);
 			((global::System.ComponentModel.ISupportInitialize)(this.axUOMap)).EndInit();
 			this.trkZoom.EndInit();
 			this.spnMaxCount.EndInit();
@@ -2843,6 +2870,10 @@
 			this.splitContainerRightDetails.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.panel3.ResumeLayout(false);
+			this.splitPanel3.Panel1.ResumeLayout(false);
+			this.splitPanel3.Panel2.ResumeLayout(false);
+			((global::System.ComponentModel.ISupportInitialize)(this.splitPanel3)).EndInit();
+			this.splitPanel3.ResumeLayout(false);
 			base.ResumeLayout(false);
 		}
 
@@ -3094,6 +3125,7 @@
 
 		// Token: 0x04000176 RID: 374
 		private global::System.Windows.Forms.Panel panelRight;
+		private global::System.Windows.Forms.SplitContainer splitPanel3;
 
 		// Token: 0x04000177 RID: 375
 		private global::System.Windows.Forms.SplitContainer splitContainerRightDetails;

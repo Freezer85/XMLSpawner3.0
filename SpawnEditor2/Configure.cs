@@ -85,41 +85,205 @@ namespace SpawnEditor2
 		{
 			this._Editor = editor;
 			this.InitializeComponent();
-			this._HKCUKey = Registry.CurrentUser.OpenSubKey(this.AppRegistryKey, true);
-			if (this._HKCUKey == null || this._HKCUKey.ValueCount < 14)
+			this.FormBorderStyle = FormBorderStyle.Sizable;
+			this.MinimumSize = new Size(516, 455);
+			this.SizeGripStyle = SizeGripStyle.Show;
+			this.MaximizeBox = true;
+			this.MinimizeBox = true;
+			this.LoadSavedConfiguration();
+		}
+
+		private void LoadSavedConfiguration()
+		{
+			SpawnEditorSetupFile configuration;
+			string configurationPath;
+			if (LocalSetupStorage.TryLoadConfiguration(Application.StartupPath, out configuration, out configurationPath))
+			{
+				this.ApplyStoredConfiguration(configuration);
+				this._LoadedConfigurationPath = configurationPath;
+				this.RefreshDynamicClientWindowValue();
+				this.UpdateConfigurationValidity();
+				return;
+			}
+
+			this._HKCUKey = Registry.CurrentUser.OpenSubKey(this.AppRegistryKey, false);
+			if (this._HKCUKey != null && this._HKCUKey.ValueCount >= 14)
+			{
+				this.CfgRunUoPathValue = (string)this._HKCUKey.GetValue(this.AppRunUoPathValue, string.Empty);
+				this.CfgUoClientPathValue = (string)this._HKCUKey.GetValue(this.AppUoClientPathValue, string.Empty);
+				this.CfgMulPathValue = (string)this._HKCUKey.GetValue(this.AppMulPathValue, string.Empty);
+				this.CfgZoomLevelValue = short.Parse(this._HKCUKey.GetValue(this.AppZoomLevelValue, "-4") as string);
+				this.CfgRunUoCmdPrefix = (string)this._HKCUKey.GetValue(this.AppRunUoCmdPrefixValue, "[");
+				this.CfgSpawnNameValue = (string)this._HKCUKey.GetValue(this.AppSpawnNameValue, "Spawner");
+				this.CfgSpawnHomeRangeValue = (int)this._HKCUKey.GetValue(this.AppSpawnHomeRangeValue, 5);
+				this.CfgSpawnMaxCountValue = (int)this._HKCUKey.GetValue(this.AppSpawnMaxCountValue, 1);
+				this.CfgSpawnMinDelayValue = (int)this._HKCUKey.GetValue(this.AppSpawnMinDelayValue, 5);
+				this.CfgSpawnMaxDelayValue = (int)this._HKCUKey.GetValue(this.AppSpawnMaxDelayValue, 10);
+				this.CfgSpawnTeamValue = (int)this._HKCUKey.GetValue(this.AppSpawnTeamValue, 0);
+				this.CfgSpawnGroupValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnGroupValue, this.CfgSpawnGroupValue);
+				this.CfgSpawnRunningValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnRunningValue, this.CfgSpawnRunningValue);
+				this.CfgSpawnRelativeHomeValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnRelativeHomeValue, this.CfgSpawnRelativeHomeValue);
+				this.CfgStartingStaticsValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingStaticsValue, this.CfgStartingStaticsValue);
+				this.CfgStartingDetailsValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingDetailsValue, this.CfgStartingDetailsValue);
+				this.CfgStartingOnTopValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingOnTopValue, this.CfgStartingOnTopValue);
+				this.CfgStartingMapValue = (WorldMap)Enum.Parse(typeof(WorldMap), this._HKCUKey.GetValue(this.AppStartingMapValue, "Trammel") as string);
+				this.CfgStartingXValue = (int)this._HKCUKey.GetValue(this.AppStartingXValue, -1);
+				this.CfgStartingYValue = (int)this._HKCUKey.GetValue(this.AppStartingYValue, -1);
+				this.CfgStartingWidthValue = (int)this._HKCUKey.GetValue(this.AppStartingWidthValue, -1);
+				this.CfgStartingHeightValue = (int)this._HKCUKey.GetValue(this.AppStartingHeightValue, -1);
+				this.CfgTransferServerAddressValue = (string)this._HKCUKey.GetValue(this.AppTransferServerAddressValue, "127.0.0.1");
+				this.CfgTransferServerPortValue = (int)this._HKCUKey.GetValue(this.AppTransferServerPortValue, 8030);
+			}
+
+			this.RefreshDynamicClientWindowValue();
+			this.UpdateConfigurationValidity();
+		}
+
+		private void ApplyStoredConfiguration(SpawnEditorSetupFile configuration)
+		{
+			if (configuration == null)
 			{
 				return;
 			}
-			this.CfgRunUoPathValue = (string)this._HKCUKey.GetValue(this.AppRunUoPathValue, string.Empty);
-			this.CfgUoClientPathValue = (string)this._HKCUKey.GetValue(this.AppUoClientPathValue, string.Empty);
-			this.CfgMulPathValue = (string)this._HKCUKey.GetValue(this.AppMulPathValue, string.Empty);
-			this.CfgUoClientWindowValue = (string)this._HKCUKey.GetValue(this.AppUoClientWindowValue, "Ultima Online Third Dawn");
-			this.CfgZoomLevelValue = short.Parse(this._HKCUKey.GetValue(this.AppZoomLevelValue, "-4") as string);
-			this.CfgRunUoCmdPrefix = (string)this._HKCUKey.GetValue(this.AppRunUoCmdPrefixValue, "[");
-			this.CfgSpawnNameValue = (string)this._HKCUKey.GetValue(this.AppSpawnNameValue, "Spawner");
-			this.CfgSpawnHomeRangeValue = (int)this._HKCUKey.GetValue(this.AppSpawnHomeRangeValue, 5);
-			this.CfgSpawnMaxCountValue = (int)this._HKCUKey.GetValue(this.AppSpawnMaxCountValue, 1);
-			this.CfgSpawnMinDelayValue = (int)this._HKCUKey.GetValue(this.AppSpawnMinDelayValue, 5);
-			this.CfgSpawnMaxDelayValue = (int)this._HKCUKey.GetValue(this.AppSpawnMaxDelayValue, 10);
-			this.CfgSpawnTeamValue = (int)this._HKCUKey.GetValue(this.AppSpawnTeamValue, 0);
-			this.CfgSpawnGroupValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnGroupValue, this.CfgSpawnGroupValue);
-			this.CfgSpawnRunningValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnRunningValue, this.CfgSpawnRunningValue);
-			this.CfgSpawnRelativeHomeValue = this.ReadRegistryBool(this._HKCUKey, this.AppSpawnRelativeHomeValue, this.CfgSpawnRelativeHomeValue);
-			this.CfgStartingStaticsValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingStaticsValue, this.CfgStartingStaticsValue);
-			this.CfgStartingDetailsValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingDetailsValue, this.CfgStartingDetailsValue);
-			this.CfgStartingOnTopValue = this.ReadRegistryBool(this._HKCUKey, this.AppStartingOnTopValue, this.CfgStartingOnTopValue);
-			this.CfgStartingMapValue = (WorldMap)Enum.Parse(typeof(WorldMap), this._HKCUKey.GetValue(this.AppStartingMapValue, "Trammel") as string);
-			this.CfgStartingXValue = (int)this._HKCUKey.GetValue(this.AppStartingXValue, -1);
-			this.CfgStartingYValue = (int)this._HKCUKey.GetValue(this.AppStartingYValue, -1);
-			this.CfgStartingWidthValue = (int)this._HKCUKey.GetValue(this.AppStartingWidthValue, -1);
-			this.CfgStartingHeightValue = (int)this._HKCUKey.GetValue(this.AppStartingHeightValue, -1);
-			this.CfgTransferServerAddressValue = (string)this._HKCUKey.GetValue(this.AppTransferServerAddressValue, "127.0.0.1");
-			this.CfgTransferServerPortValue = (int)this._HKCUKey.GetValue(this.AppTransferServerPortValue, 8030);
-			if (!File.Exists(this.CfgRunUoPathValue) || this.CfgUoClientPathValue.Length <= 0)
+
+			this.CfgRunUoPathValue = configuration.RunUoExePath ?? string.Empty;
+			this.CfgUoClientPathValue = configuration.UltimaClientExePath ?? string.Empty;
+			this.CfgMulPathValue = configuration.MulFilesPath ?? string.Empty;
+			this.CfgZoomLevelValue = configuration.ZoomLevel;
+			this.CfgRunUoCmdPrefix = configuration.RunUoCmdPrefix ?? "[";
+			this.CfgSpawnNameValue = configuration.SpawnName ?? "Spawn";
+			this.CfgSpawnHomeRangeValue = configuration.SpawnHomeRange;
+			this.CfgSpawnMaxCountValue = configuration.SpawnMaxCount;
+			this.CfgSpawnMinDelayValue = configuration.SpawnMinDelay;
+			this.CfgSpawnMaxDelayValue = configuration.SpawnMaxDelay;
+			this.CfgSpawnTeamValue = configuration.SpawnTeam;
+			this.CfgSpawnGroupValue = configuration.SpawnGroup;
+			this.CfgSpawnRunningValue = configuration.SpawnRunning;
+			this.CfgSpawnRelativeHomeValue = configuration.SpawnRelativeHome;
+			this.CfgStartingStaticsValue = configuration.StartingStatics;
+			this.CfgStartingDetailsValue = configuration.StartingDetails;
+			this.CfgStartingMapValue = configuration.StartingMap;
+			this.CfgStartingOnTopValue = configuration.StartingOnTop;
+			this.CfgStartingXValue = configuration.StartingX;
+			this.CfgStartingYValue = configuration.StartingY;
+			this.CfgStartingWidthValue = configuration.StartingWidth;
+			this.CfgStartingHeightValue = configuration.StartingHeight;
+			this.CfgTransferServerAddressValue = string.IsNullOrWhiteSpace(configuration.TransferServerAddress) ? "127.0.0.1" : configuration.TransferServerAddress;
+			this.CfgTransferServerPortValue = configuration.TransferServerPort <= 0 ? 8030 : configuration.TransferServerPort;
+		}
+
+		private SpawnEditorSetupFile CreateStoredConfiguration()
+		{
+			return new SpawnEditorSetupFile
+			{
+				RunUoExePath = this.CfgRunUoPathValue ?? string.Empty,
+				UltimaClientExePath = this.CfgUoClientPathValue ?? string.Empty,
+				MulFilesPath = this.CfgMulPathValue ?? string.Empty,
+				ZoomLevel = this.CfgZoomLevelValue,
+				RunUoCmdPrefix = this.CfgRunUoCmdPrefix ?? "[",
+				SpawnName = this.CfgSpawnNameValue ?? "Spawn",
+				SpawnHomeRange = this.CfgSpawnHomeRangeValue,
+				SpawnMaxCount = this.CfgSpawnMaxCountValue,
+				SpawnMinDelay = this.CfgSpawnMinDelayValue,
+				SpawnMaxDelay = this.CfgSpawnMaxDelayValue,
+				SpawnTeam = this.CfgSpawnTeamValue,
+				SpawnGroup = this.CfgSpawnGroupValue,
+				SpawnRunning = this.CfgSpawnRunningValue,
+				SpawnRelativeHome = this.CfgSpawnRelativeHomeValue,
+				StartingStatics = this.CfgStartingStaticsValue,
+				StartingDetails = this.CfgStartingDetailsValue,
+				StartingMap = this.CfgStartingMapValue,
+				StartingOnTop = this.CfgStartingOnTopValue,
+				StartingX = this.CfgStartingXValue,
+				StartingY = this.CfgStartingYValue,
+				StartingWidth = this.CfgStartingWidthValue,
+				StartingHeight = this.CfgStartingHeightValue,
+				TransferServerAddress = this.CfgTransferServerAddressValue ?? "127.0.0.1",
+				TransferServerPort = this.CfgTransferServerPortValue
+			};
+		}
+
+		public void SaveCurrentConfiguration()
+		{
+			string configurationPath = LocalSetupStorage.GetConfigurationPath(Application.StartupPath, this.CfgUoClientPathValue, this._LoadedConfigurationPath);
+			LocalSetupStorage.SaveConfiguration(Application.StartupPath, configurationPath, this.CreateStoredConfiguration());
+			this._LoadedConfigurationPath = configurationPath;
+		}
+
+		public SetupProfileInfo[] GetAvailableSetupProfiles()
+		{
+			return LocalSetupStorage.GetProfiles(Application.StartupPath, this.CfgUoClientPathValue, this._LoadedConfigurationPath).ToArray();
+		}
+
+		public string GetSetupProfilesDirectory()
+		{
+			return LocalSetupStorage.GetProfilesDirectory(Application.StartupPath, this.CfgUoClientPathValue, this._LoadedConfigurationPath);
+		}
+
+		public void SaveSetupProfile(string filePath, string profileName)
+		{
+			SpawnEditorSetupFile configuration = this.CreateStoredConfiguration();
+			configuration.ProfileName = profileName ?? string.Empty;
+			LocalSetupStorage.SaveProfile(filePath, configuration);
+		}
+
+		public void DeleteSetupProfile(string filePath)
+		{
+			if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
 			{
 				return;
 			}
-			this._IsValidConfiguration = true;
+
+			File.Delete(filePath);
+		}
+
+		public bool LoadAndApplySetupProfile(string filePath)
+		{
+			SpawnEditorSetupFile profile;
+			if (!LocalSetupStorage.TryLoadProfile(filePath, out profile))
+			{
+				return false;
+			}
+
+			this.ApplyStoredConfiguration(profile);
+			this.RefreshDynamicClientWindowValue();
+			this.UpdateConfigurationValidity();
+			this.SaveCurrentConfiguration();
+			if (this._Editor != null)
+			{
+				this.ConfigureTransferServer();
+			}
+			return true;
+		}
+
+		private void UpdateConfigurationValidity()
+		{
+			this._IsValidConfiguration = !string.IsNullOrEmpty(this.CfgRunUoPathValue) && File.Exists(this.CfgRunUoPathValue) && !string.IsNullOrEmpty(this.CfgUoClientPathValue);
+		}
+
+		private void RefreshDynamicClientWindowValue()
+		{
+			this.CfgUoClientWindowValue = this.ResolveClientWindowValue(this.CfgUoClientPathValue);
+		}
+
+		private string ResolveClientWindowValue(string clientPath)
+		{
+			string pidText = this.GetClientProcessIdByPath(clientPath);
+			if (!string.IsNullOrEmpty(pidText))
+			{
+				return pidText;
+			}
+
+			string executableName = Path.GetFileName(clientPath ?? string.Empty).ToLowerInvariant();
+			if (executableName == "uotd.exe")
+			{
+				return "Ultima Online Third Dawn";
+			}
+			if (executableName == "client.exe")
+			{
+				return "Ultima Online";
+			}
+			return string.Empty;
 		}
 
 		// Token: 0x06000023 RID: 35 RVA: 0x0000586D File Offset: 0x00003A6D
@@ -215,36 +379,16 @@ namespace SpawnEditor2
 		// Token: 0x06000026 RID: 38 RVA: 0x00005B1C File Offset: 0x00003D1C
 		private void SetClientWindowName()
 		{
-			string pidText = this.GetClientProcessIdByExe();
-			if (!string.IsNullOrEmpty(pidText))
-			{
-				this.CfgUoClientWindowValue = pidText;
-			}
-			else
-			{
-				string text = Path.GetFileName(this.txtUltimaClient.Text).ToLowerInvariant();
-				if (text == "uotd.exe")
-				{
-					this.CfgUoClientWindowValue = "Ultima Online Third Dawn";
-				}
-				else if (text == "client.exe")
-				{
-					this.CfgUoClientWindowValue = "Ultima Online";
-				}
-				else
-				{
-					this.CfgUoClientWindowValue = "";
-				}
-			}
+			this.CfgUoClientWindowValue = this.ResolveClientWindowValue(this.txtUltimaClient.Text);
 			this.RefreshProcessList();
 			this.SelectProcessByConfig(this.CfgUoClientWindowValue);
 		}
 
-		private string GetClientProcessIdByExe()
+		private string GetClientProcessIdByPath(string clientPath)
 		{
 			try
 			{
-				string path = this.txtUltimaClient.Text.Trim();
+				string path = (clientPath ?? string.Empty).Trim();
 				if (string.IsNullOrEmpty(path))
 				{
 					return null;
@@ -576,29 +720,8 @@ namespace SpawnEditor2
 				MessageBox.Show(this, "You must set the path to the Ultima Online client EXE before proceeding!", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				return;
 			}
-			if (this._HKCUKey == null)
-			{
-				this._HKCUKey = Registry.CurrentUser.CreateSubKey(this.AppRegistryKey);
-			}
-			this._HKCUKey.SetValue(this.AppRunUoPathValue, this.CfgRunUoPathValue);
-			this._HKCUKey.SetValue(this.AppUoClientPathValue, this.CfgUoClientPathValue);
-			this._HKCUKey.SetValue(this.AppMulPathValue, this.CfgMulPathValue);
-			this._HKCUKey.SetValue(this.AppUoClientWindowValue, this.CfgUoClientWindowValue);
-			this._HKCUKey.SetValue(this.AppZoomLevelValue, this.CfgZoomLevelValue.ToString());
-			this._HKCUKey.SetValue(this.AppRunUoCmdPrefixValue, this.CfgRunUoCmdPrefix);
-			this._HKCUKey.SetValue(this.AppSpawnNameValue, this.CfgSpawnNameValue);
-			this._HKCUKey.SetValue(this.AppSpawnHomeRangeValue, this.CfgSpawnHomeRangeValue);
-			this._HKCUKey.SetValue(this.AppSpawnMaxCountValue, this.CfgSpawnMaxCountValue);
-			this._HKCUKey.SetValue(this.AppSpawnMinDelayValue, this.CfgSpawnMinDelayValue);
-			this._HKCUKey.SetValue(this.AppSpawnMaxDelayValue, this.CfgSpawnMaxDelayValue);
-			this._HKCUKey.SetValue(this.AppSpawnTeamValue, this.CfgSpawnTeamValue);
-			this._HKCUKey.SetValue(this.AppSpawnGroupValue, this.CfgSpawnGroupValue ? 1 : 0);
-			this._HKCUKey.SetValue(this.AppSpawnRunningValue, this.CfgSpawnRunningValue ? 1 : 0);
-			this._HKCUKey.SetValue(this.AppSpawnRelativeHomeValue, this.CfgSpawnRelativeHomeValue ? 1 : 0);
-			this._HKCUKey.SetValue(this.AppStartingStaticsValue, this.CfgStartingStaticsValue ? 1 : 0);
-			this._HKCUKey.SetValue(this.AppStartingDetailsValue, this.CfgStartingDetailsValue ? 1 : 0);
-			this._HKCUKey.SetValue(this.AppStartingMapValue, this.CfgStartingMapValue.ToString());
-			this._HKCUKey.SetValue(this.AppStartingOnTopValue, this.CfgStartingOnTopValue ? 1 : 0);
+			this.RefreshDynamicClientWindowValue();
+			this.SaveCurrentConfiguration();
 			this._IsValidConfiguration = true;
 			base.Close();
 		}
@@ -606,14 +729,15 @@ namespace SpawnEditor2
 		// Token: 0x06000028 RID: 40 RVA: 0x00005F54 File Offset: 0x00004154
 		public void SaveWindowConfiguration()
 		{
-			if (this._HKCUKey == null || this._Editor == null)
+			if (this._Editor == null)
 			{
 				return;
 			}
-			this._HKCUKey.SetValue(this.AppStartingXValue, this._Editor.Location.X);
-			this._HKCUKey.SetValue(this.AppStartingYValue, this._Editor.Location.Y);
-			this._HKCUKey.SetValue(this.AppStartingWidthValue, this._Editor.Width);
-			this._HKCUKey.SetValue(this.AppStartingHeightValue, this._Editor.Height);
+			this.CfgStartingXValue = this._Editor.Location.X;
+			this.CfgStartingYValue = this._Editor.Location.Y;
+			this.CfgStartingWidthValue = this._Editor.Width;
+			this.CfgStartingHeightValue = this._Editor.Height;
+			this.SaveCurrentConfiguration();
 		}
 
 		// Token: 0x06000029 RID: 41 RVA: 0x00006006 File Offset: 0x00004206
@@ -626,18 +750,19 @@ namespace SpawnEditor2
 		// Token: 0x0600002A RID: 42 RVA: 0x00006044 File Offset: 0x00004244
 		public void SaveTransferServerConfiguration()
 		{
-			if (this._HKCUKey == null || this._Editor == null)
+			if (this._Editor == null)
 			{
 				return;
 			}
-			this._HKCUKey.SetValue(this.AppTransferServerAddressValue, this._Editor._TransferDialog.txtTransferServerAddress.Text);
+			this.CfgTransferServerAddressValue = this._Editor._TransferDialog.txtTransferServerAddress.Text;
 			try
 			{
-				this._HKCUKey.SetValue(this.AppTransferServerPortValue, int.Parse(this._Editor._TransferDialog.txtTransferServerPort.Text));
+				this.CfgTransferServerPortValue = int.Parse(this._Editor._TransferDialog.txtTransferServerPort.Text);
 			}
 			catch
 			{
 			}
+			this.SaveCurrentConfiguration();
 		}
 
 		// Token: 0x0400002B RID: 43
@@ -800,6 +925,8 @@ namespace SpawnEditor2
 
 		// Token: 0x0400005F RID: 95
 		private RegistryKey _HKCUKey;
+
+		private string _LoadedConfigurationPath;
 
 		// Token: 0x04000060 RID: 96
 		public string CfgRunUoPathValue;

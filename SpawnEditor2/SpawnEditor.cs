@@ -22,6 +22,8 @@ namespace SpawnEditor2
 	// Token: 0x02000014 RID: 20
 	public partial class SpawnEditor : Form
 	{
+
+
 		// Token: 0x1700001F RID: 31
 		// (get) Token: 0x06000097 RID: 151 RVA: 0x00009870 File Offset: 0x00007A70
 		public bool SpawnLocationLocked
@@ -44,6 +46,7 @@ namespace SpawnEditor2
 			SpawnEditor.Debug("Initialized");
 			this.chkDetails.Checked = true;
 			this.LargeWindow();
+			this.ApplyInitialLayout();
 			SpawnEditor.Debug("WindowConfigured");
 			this._CfgDialog = new Configure(this);
 			SpawnEditor.Debug("ConfigurationDialog");
@@ -51,6 +54,247 @@ namespace SpawnEditor2
 			SpawnEditor.Debug("TransferDialog");
 			this._SpawnerFilters = new SpawnerFilters(this);
 			SpawnEditor.Debug("SpawnerFilters");
+			this.InitializeSetupMenu();
+		}
+
+		private void ApplyInitialLayout()
+		{
+			// grpSpawnEdit and groupBox1 fill their tab pages via Dock=Fill; TabPage.Padding is the inner margin.
+			this.tabBasic.Padding = new Padding(4, 4, 8, 8);
+			this.tabAdvanced.Padding = new Padding(4, 4, 8, 8);
+			this.tabBasic.AutoScroll = false;
+			this.tabAdvanced.AutoScroll = false;
+			this.grpSpawnEdit.Dock = DockStyle.Fill;
+			this.groupBox1.Dock = DockStyle.Fill;
+
+			// groupTemplateList fills splitPanel3.Panel1; grpSpawnEntries fills splitPanel3.Panel2.
+			this.groupTemplateList.Dock = DockStyle.Fill;
+			this.grpSpawnEntries.Dock = DockStyle.Fill;
+		}
+
+		private void InitializeSetupMenu()
+		{
+			this._mniOpenSetup = new MenuItem("Open Setup...", new EventHandler(this.menuItem9_Click));
+			this._mniSaveSetupProfile = new MenuItem("Save Current Profile...", new EventHandler(this.mniSaveSetupProfile_Click));
+			this._mniSaveDefaultSetupProfile = new MenuItem("Save As Default Profile", new EventHandler(this.mniSaveDefaultSetupProfile_Click));
+			this._mniSetupProfiles = new MenuItem("Load Profile");
+			this._mniSetupProfiles.Popup += new EventHandler(this.mniSetupProfiles_Popup);
+			this._mniDeleteSetupProfile = new MenuItem("Delete Profile");
+			this._mniDeleteSetupProfile.Popup += new EventHandler(this.mniDeleteSetupProfiles_Popup);
+			this.menuItem9.MenuItems.Clear();
+			this.menuItem9.MenuItems.AddRange(new MenuItem[]
+			{
+				this._mniOpenSetup,
+				this._mniSaveSetupProfile,
+				this._mniSaveDefaultSetupProfile,
+				this._mniSetupProfiles,
+				this._mniDeleteSetupProfile
+			});
+		}
+
+		private void mniSaveSetupProfile_Click(object sender, EventArgs e)
+		{
+			string profilesDirectory = this._CfgDialog.GetSetupProfilesDirectory();
+			Directory.CreateDirectory(profilesDirectory);
+
+			using (SaveFileDialog saveDialog = new SaveFileDialog())
+			{
+				saveDialog.Title = "Save Setup Profile";
+				saveDialog.InitialDirectory = profilesDirectory;
+				saveDialog.Filter = "Setup Profile (*.profile.xml)|*.profile.xml|XML files (*.xml)|*.xml";
+				saveDialog.DefaultExt = "profile.xml";
+				saveDialog.AddExtension = true;
+				saveDialog.FileName = this.GetDefaultSetupProfileFileName();
+				if (saveDialog.ShowDialog(this) != DialogResult.OK)
+				{
+					return;
+				}
+
+				string selectedPath = saveDialog.FileName;
+				if (!selectedPath.EndsWith(".profile.xml", StringComparison.OrdinalIgnoreCase))
+				{
+					selectedPath += ".profile.xml";
+				}
+
+				string profileName = Path.GetFileNameWithoutExtension(selectedPath);
+				if (profileName.EndsWith(".profile", StringComparison.OrdinalIgnoreCase))
+				{
+					profileName = profileName.Substring(0, profileName.Length - ".profile".Length);
+				}
+
+				try
+				{
+					this._CfgDialog.SaveSetupProfile(selectedPath, profileName);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(this, "Unable to save the setup profile.\n" + ex.Message, "Profile Save Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+				}
+			}
+		}
+
+		private string GetDefaultSetupProfileFileName()
+		{
+			string baseName = Path.GetFileNameWithoutExtension(this._CfgDialog.CfgUoClientPathValue);
+			if (string.IsNullOrWhiteSpace(baseName))
+			{
+				baseName = "SetupProfile";
+			}
+
+			foreach (char invalidChar in Path.GetInvalidFileNameChars())
+			{
+				baseName = baseName.Replace(invalidChar, '_');
+			}
+
+			return baseName + ".profile.xml";
+		}
+
+		private void mniSaveDefaultSetupProfile_Click(object sender, EventArgs e)
+		{
+			string profilesDirectory = this._CfgDialog.GetSetupProfilesDirectory();
+			Directory.CreateDirectory(profilesDirectory);
+			string defaultProfilePath = Path.Combine(profilesDirectory, "Default.profile.xml");
+
+			try
+			{
+				this._CfgDialog.SaveSetupProfile(defaultProfilePath, "Default");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, "Unable to save the default setup profile.\n" + ex.Message, "Default Profile Save Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			}
+		}
+
+		private void mniSetupProfiles_Popup(object sender, EventArgs e)
+		{
+			this._mniSetupProfiles.MenuItems.Clear();
+			SetupProfileInfo[] profiles = this._CfgDialog.GetAvailableSetupProfiles();
+			if (profiles.Length == 0)
+			{
+				MenuItem emptyItem = new MenuItem("(no profiles found)");
+				emptyItem.Enabled = false;
+				this._mniSetupProfiles.MenuItems.Add(emptyItem);
+			}
+			else
+			{
+				foreach (SetupProfileInfo profile in profiles)
+				{
+					string filePath = profile.FilePath;
+					MenuItem profileItem = new MenuItem(profile.DisplayName);
+					profileItem.Click += delegate(object menuSender, EventArgs menuArgs)
+					{
+						this.LoadSetupProfile(filePath);
+					};
+					this._mniSetupProfiles.MenuItems.Add(profileItem);
+				}
+			}
+
+			this._mniSetupProfiles.MenuItems.Add("-");
+			this._mniSetupProfiles.MenuItems.Add(new MenuItem("Open Profiles Folder", new EventHandler(this.mniOpenProfilesFolder_Click)));
+		}
+
+		private void mniDeleteSetupProfiles_Popup(object sender, EventArgs e)
+		{
+			this._mniDeleteSetupProfile.MenuItems.Clear();
+			SetupProfileInfo[] profiles = this._CfgDialog.GetAvailableSetupProfiles();
+			if (profiles.Length == 0)
+			{
+				MenuItem emptyItem = new MenuItem("(no profiles found)");
+				emptyItem.Enabled = false;
+				this._mniDeleteSetupProfile.MenuItems.Add(emptyItem);
+				return;
+			}
+
+			foreach (SetupProfileInfo profile in profiles)
+			{
+				SetupProfileInfo capturedProfile = profile;
+				MenuItem profileItem = new MenuItem(profile.DisplayName);
+				profileItem.Click += delegate(object menuSender, EventArgs menuArgs)
+				{
+					this.DeleteSetupProfile(capturedProfile);
+				};
+				this._mniDeleteSetupProfile.MenuItems.Add(profileItem);
+			}
+		}
+
+		private void mniOpenProfilesFolder_Click(object sender, EventArgs e)
+		{
+			string profilesDirectory = this._CfgDialog.GetSetupProfilesDirectory();
+			Directory.CreateDirectory(profilesDirectory);
+			Process.Start("explorer.exe", profilesDirectory);
+		}
+
+		private void LoadSetupProfile(string filePath)
+		{
+			if (!this._CfgDialog.LoadAndApplySetupProfile(filePath))
+			{
+				MessageBox.Show(this, "Unable to load the selected setup profile.", "Profile Load Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+				return;
+			}
+
+			this.ApplyCurrentSetupValues();
+		}
+
+		private void DeleteSetupProfile(SetupProfileInfo profile)
+		{
+			if (profile == null)
+			{
+				return;
+			}
+
+			if (MessageBox.Show(this, string.Format("Delete setup profile '{0}'?", profile.DisplayName), "Delete Profile", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
+			{
+				return;
+			}
+
+			try
+			{
+				this._CfgDialog.DeleteSetupProfile(profile.FilePath);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, "Unable to delete the selected setup profile.\n" + ex.Message, "Profile Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			}
+		}
+
+		private void ApplyCurrentSetupValues()
+		{
+			try
+			{
+				string mulPath = this._CfgDialog.CfgMulPathValue;
+				if (string.IsNullOrEmpty(mulPath) || !Directory.Exists(mulPath))
+				{
+					mulPath = Path.GetDirectoryName(this._CfgDialog.CfgUoClientPathValue);
+				}
+				if (!string.IsNullOrEmpty(mulPath) && Directory.Exists(mulPath))
+				{
+					this.axUOMap.SetClientPath(mulPath.TrimEnd('\\') + "\\");
+				}
+			}
+			catch
+			{
+			}
+
+			this.axUOMap.ZoomLevel = this._CfgDialog.CfgZoomLevelValue;
+			this.trkZoom.Value = (int)this.axUOMap.ZoomLevel;
+			this.chkDrawStatics.Checked = this._CfgDialog.CfgStartingStaticsValue;
+			this.chkDetails.Checked = this._CfgDialog.CfgStartingDetailsValue;
+			if (this.cbxMap.Items.Count > (int)this._CfgDialog.CfgStartingMapValue)
+			{
+				this.cbxMap.SelectedIndex = (int)this._CfgDialog.CfgStartingMapValue;
+			}
+			this.mniAlwaysOnTop.Checked = this._CfgDialog.CfgStartingOnTopValue;
+			base.TopMost = this.mniAlwaysOnTop.Checked;
+			if (this._CfgDialog.CfgStartingXValue >= 0 && this._CfgDialog.CfgStartingYValue >= 0)
+			{
+				base.Location = new Point(this._CfgDialog.CfgStartingXValue, this._CfgDialog.CfgStartingYValue);
+			}
+			if (this._CfgDialog.CfgStartingWidthValue >= 0 && this._CfgDialog.CfgStartingHeightValue >= 0)
+			{
+				base.Size = new Size(this._CfgDialog.CfgStartingWidthValue, this._CfgDialog.CfgStartingHeightValue);
+			}
+			this._CfgDialog.ConfigureTransferServer();
+			this.RefreshSpawnPoints();
 		}
 
 		// Token: 0x06000099 RID: 153 RVA: 0x00009994 File Offset: 0x00007B94
@@ -191,6 +435,16 @@ namespace SpawnEditor2
 			this.mniDeleteInSelectionWindow.Enabled = false;
 			this.mniDeleteNotSelected.Enabled = false;
 			this.mniModifyInSelectionWindow.Enabled = false;
+		}
+
+		private void SpawnEditor_Resize(object sender, EventArgs e)
+		{
+			if (this.panelRight != null && this.panelRight.Visible && this.axUOMap != null && this.panel1 != null)
+			{
+				int mapW = Math.Max(100, this.panel1.ClientSize.Width - this.panelRight.Width);
+				int mapH = Math.Max(200, this.panel1.ClientSize.Height);
+				this.axUOMap.SetBounds(0, 0, mapW, mapH);
+			}
 		}
 
 		// Token: 0x0600009F RID: 159 RVA: 0x00009CB8 File Offset: 0x00007EB8
@@ -4597,17 +4851,15 @@ namespace SpawnEditor2
 			if (!this.savewindowsize.IsEmpty && !this.savepanelsize.IsEmpty)
 			{
 				base.Size = this.savewindowsize;
-				this.panel1.Size = this.savepanelsize;
 			}
 			else
 			{
 				base.Size = new Size(660, 520);
-				this.panel1.Size = new Size(480, 517);
 			}
 			this.panel1.Visible = true;
+			this.panelRight.Visible = false;
 			this.tabControl1.Visible = false;
 			this.panel3.Visible = false;
-			this.axUOMap.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 			if (!this.savemapsize.IsEmpty && !this.savelistsize.IsEmpty)
 			{
 				this.axUOMap.Size = this.savemapsize;
@@ -4621,16 +4873,19 @@ namespace SpawnEditor2
 		// Token: 0x060000F3 RID: 243 RVA: 0x0001DEA4 File Offset: 0x0001C0A4
 		private void LargeWindow()
 		{
-			this.MinimumSize = new Size(660, 520);
+			this.MinimumSize = new Size(1400, 680);
 			this.MaximumSize = Size.Empty;
 			this.panel1.Visible = true;
+			this.panelRight.Visible = true;
 			this.tabControl1.Visible = true;
 			this.panel3.Visible = true;
-			this.axUOMap.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-			if (base.Width < 1220 || base.Height < 780)
+			if (base.ClientSize.Width < 1420 || base.ClientSize.Height < 780)
 			{
-				base.Size = new Size(Math.Max(base.Width, 1220), Math.Max(base.Height, 780));
+				base.ClientSize = new Size(Math.Max(base.ClientSize.Width, 1420), Math.Max(base.ClientSize.Height, 780));
 			}
+			int mapW = Math.Max(100, base.ClientSize.Width - this.pnlControls.Width - this.panelRight.Width);
+			int mapH = Math.Max(200, this.panel1.ClientSize.Height);
+			this.axUOMap.SetBounds(0, 0, mapW, mapH);
 		}
 
 		// Token: 0x060000F4 RID: 244 RVA: 0x0001DF54 File Offset: 0x0001C154
@@ -4653,7 +4908,13 @@ namespace SpawnEditor2
 		// Token: 0x060000F6 RID: 246 RVA: 0x0001DFC8 File Offset: 0x0001C1C8
 		private void menuItem9_Click(object sender, EventArgs e)
 		{
+			this._CfgDialog.FormBorderStyle = FormBorderStyle.Sizable;
+			this._CfgDialog.MinimumSize = new Size(516, 455);
+			this._CfgDialog.SizeGripStyle = SizeGripStyle.Show;
+			this._CfgDialog.MaximizeBox = true;
+			this._CfgDialog.MinimizeBox = true;
 			this._CfgDialog.ShowDialog();
+			this.ApplyCurrentSetupValues();
 		}
 
 		// Token: 0x060000F7 RID: 247 RVA: 0x0001DFD6 File Offset: 0x0001C1D6
@@ -6829,6 +7090,16 @@ namespace SpawnEditor2
 
 		// Token: 0x04000117 RID: 279
 		internal Configure _CfgDialog;
+
+		private MenuItem _mniOpenSetup;
+
+		private MenuItem _mniSaveSetupProfile;
+
+		private MenuItem _mniSaveDefaultSetupProfile;
+
+		private MenuItem _mniSetupProfiles;
+
+		private MenuItem _mniDeleteSetupProfile;
 
 		// Token: 0x04000118 RID: 280
 		internal TransferServerSettings _TransferDialog;
